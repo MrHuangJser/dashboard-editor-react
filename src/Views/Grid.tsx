@@ -40,7 +40,7 @@ export function useGridState(props: GridProps) {
     if (props.scale !== undefined) {
       setSize({ width: width * props.scale, height: height * props.scale });
     }
-  }, [props]);
+  }, [props.scale]);
 
   return {
     height,
