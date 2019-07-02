@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { GridProps } from '../types/Grid';
+import React, { useEffect, useState } from "react";
+import { GridProps } from "../types/Grid";
 
-export const Grid: React.FC<GridProps> = props => {
+export const Grid: React.FC<GridProps> = (props) => {
   const { width, height } = useGridState(props);
 
   return (
-    <div className='grid-container'>
-      <svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'>
+    <div className="grid-container">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <pattern id='grid' width={width} height={height} patternUnits='userSpaceOnUse'>
+          <pattern id="grid" width={width} height={height} patternUnits="userSpaceOnUse">
             <path
               d={`M ${width} 0 L 0 0 0 ${height}`}
-              fill='none'
-              stroke='rgba(207, 207, 207, 0.8)'
-              strokeWidth='1'
+              fill="none"
+              stroke="rgba(207, 207, 207, 0.8)"
+              strokeWidth="1"
             />
           </pattern>
         </defs>
-        <rect width='100%' height='100%' fill='url(#grid)' />
+        <rect width="100%" height="100%" fill="url(#grid)" />
       </svg>
     </div>
   );
@@ -43,8 +43,8 @@ export function useGridState(props: GridProps) {
   }, [props]);
 
   return {
-    width,
     height,
-    setSize
+    setSize,
+    width,
   };
 }
