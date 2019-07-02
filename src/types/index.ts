@@ -1,10 +1,10 @@
-export interface Transform {
+export interface ITransform {
   s: number;
   x: number;
   y: number;
 }
 
-export interface Size {
+export interface ISize {
   width?: number;
   height?: number;
 }

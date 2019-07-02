@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { NoZoomAreaProps } from '../types/NoZoomArea';
+import React, { useEffect, useState } from "react";
+import { INoZoomAreaProps } from "../types/NoZoomArea";
 
-export const NoZoomArea: React.FC<NoZoomAreaProps> = props => {
+export const NoZoomArea: React.FC<INoZoomAreaProps> = (props) => {
   const { width, height } = useNoZoomAreaState(props);
 
   return (
     <div
-      className='no-zoom-area'
+      className="no-zoom-area"
       style={{
         width: `${width}px`,
         height: `${height}px`,
         left: `${props.transform.x}px`,
-        right: `${props.transform.y}px`
+        right: `${props.transform.y}px`,
       }}
     >
       {props.children}
@@ -19,7 +19,7 @@ export const NoZoomArea: React.FC<NoZoomAreaProps> = props => {
   );
 };
 
-export function useNoZoomAreaState(props: NoZoomAreaProps) {
+export function useNoZoomAreaState(props: INoZoomAreaProps) {
   const [width, setWidth] = useState(props.width || 0);
   const [height, setHeight] = useState(props.height || 0);
 
@@ -30,6 +30,6 @@ export function useNoZoomAreaState(props: NoZoomAreaProps) {
 
   return {
     width,
-    height
+    height,
   };
 }

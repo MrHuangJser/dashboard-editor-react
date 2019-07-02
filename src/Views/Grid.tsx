@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { GridProps } from "../types/Grid";
+import { IGridProps } from "../types/Grid";
 
-export const Grid: React.FC<GridProps> = (props) => {
+export const Grid: React.FC<IGridProps> = (props) => {
   const { width, height } = useGridState(props);
 
   return (
@@ -23,7 +23,7 @@ export const Grid: React.FC<GridProps> = (props) => {
   );
 };
 
-export function useGridState(props: GridProps) {
+export function useGridState(props: IGridProps) {
   const [width, setWidth] = useState(10);
   const [height, setHeight] = useState(10);
 

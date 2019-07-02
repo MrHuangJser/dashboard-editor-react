@@ -1,7 +1,7 @@
-import { Transform } from './index';
+import { ITransform } from "./index";
 
-export interface NoZoomAreaProps {
+export interface INoZoomAreaProps {
   width?: number;
   height?: number;
-  transform: Transform;
+  transform: ITransform;
 }

@@ -1,13 +1,13 @@
-export interface ActionType<T, P> {
+export interface IActionType<T, P> {
   type: T;
   payload: P;
 }
 
 export type EditorTransformActionType =
-  | ActionType<'SET_SCALE', number>
-  | ActionType<'SET_X', number>
-  | ActionType<'SET_Y', number>;
+  | IActionType<"SET_SCALE", number>
+  | IActionType<"SET_X", number>
+  | IActionType<"SET_Y", number>;
 
 export type EditorSizeActionType =
-  | ActionType<'SET_WIDTH', number>
-  | ActionType<'SET_HEIGHT', number>;
+  | IActionType<"SET_WIDTH", number>
+  | IActionType<"SET_HEIGHT", number>;

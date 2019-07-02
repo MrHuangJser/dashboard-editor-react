@@ -1,3 +1,3 @@
-export interface GridProps {
+export interface IGridProps {
   scale: number;
 }
