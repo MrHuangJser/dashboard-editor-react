@@ -1,25 +1,39 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useRef } from "react";
+import { ZoomWrap } from "./Components/Zoom";
 import { EditorSizeActionType, EditorTransformActionType } from "./types/Editor";
 import { ISize, ITransform } from "./types/index";
 import { Grid } from "./Views/Grid";
 import { NoZoomArea } from "./Views/NoZoomArea";
 
 const Editor: React.FC<{}> = () => {
-  const { size, transform } = useEditorState();
-
+  const { editorContainerRef, size, transform, transformDispatch } = useEditorState();
   return (
-    <div className="editor-container">
-      <NoZoomArea width={size.width} height={size.height} transform={transform}>
-        <Grid scale={transform.s} />
-      </NoZoomArea>
-    </div>
+    <ZoomWrap
+      onZoom={(s, x, y) => {
+        console.log(s, x, y);
+      }}
+    >
+      <div
+        className="editor-container"
+        ref={(ref) => {
+          if (ref) {
+            editorContainerRef.current = ref;
+          }
+        }}
+      >
+        <NoZoomArea width={size.width} height={size.height} transform={transform}>
+          <Grid scale={transform.s} />
+        </NoZoomArea>
+      </div>
+    </ZoomWrap>
   );
 };
 
 export default Editor;
 
 export function useEditorState() {
-  const [size, sizeDispatch] = useReducer(sizeReducer, { width: 800, height: 600 });
+  const editorContainerRef = useRef<HTMLElement>();
+  const [size, sizeDispatch] = useReducer(sizeReducer, { width: 800, height: 400 });
   const [transform, transformDispatch] = useReducer(transformReducer, {
     s: 1,
     x: 0,
@@ -27,6 +41,7 @@ export function useEditorState() {
   });
 
   return {
+    editorContainerRef,
     size,
     sizeDispatch,
     transform,
@@ -56,7 +71,7 @@ export function transformReducer(
       return { ...state, x: action.payload };
     case "SET_Y":
       return { ...state, y: action.payload };
-    default:
-      return state;
+    case undefined:
+      return (action.payload as ITransform) || state;
   }
 }

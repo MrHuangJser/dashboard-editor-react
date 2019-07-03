@@ -10,8 +10,7 @@ export const NoZoomArea: React.FC<INoZoomAreaProps> = (props) => {
       style={{
         width: `${width}px`,
         height: `${height}px`,
-        left: `${props.transform.x}px`,
-        right: `${props.transform.y}px`,
+        transform: `translate3d(${props.transform.x}px,${props.transform.y}px,0)`,
       }}
     >
       {props.children}
@@ -24,9 +23,11 @@ export function useNoZoomAreaState(props: INoZoomAreaProps) {
   const [height, setHeight] = useState(props.height || 0);
 
   useEffect(() => {
-    setWidth(width * props.transform.s);
-    setHeight(height * props.transform.s);
-  }, []);
+    if (props.width && props.height) {
+      setWidth(props.width * props.transform.s);
+      setHeight(props.height * props.transform.s);
+    }
+  }, [props.transform]);
 
   return {
     width,

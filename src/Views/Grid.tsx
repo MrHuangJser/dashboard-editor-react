@@ -38,7 +38,7 @@ export function useGridState(props: IGridProps) {
 
   useEffect(() => {
     if (props.scale !== undefined) {
-      setSize({ width: width * props.scale, height: height * props.scale });
+      setSize({ width: 10 * props.scale, height: 10 * props.scale });
     }
   }, [props.scale]);
 
