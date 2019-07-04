@@ -1,4 +1,4 @@
-import { ITransform } from "./index";
+import { ISize, ITransform } from "./index";
 
 export interface IActionType<T, P> {
   type?: T;
@@ -12,5 +12,6 @@ export type EditorTransformActionType =
   | IActionType<undefined, ITransform>;
 
 export type EditorSizeActionType =
+  | IActionType<"SET_SIZE", ISize>
   | IActionType<"SET_WIDTH", number>
   | IActionType<"SET_HEIGHT", number>;

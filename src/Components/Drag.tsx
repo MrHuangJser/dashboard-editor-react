@@ -1,28 +1,22 @@
-import React, { MutableRefObject, useEffect } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import { fromEvent, Subscription } from "rxjs";
+import { filter, switchMap } from "rxjs/operators";
 
-export interface IDragProps {
+export interface IDragWrapProps {
   domRef: MutableRefObject<HTMLElement | undefined>;
+  useSpace?: boolean;
   onDrag?: (e?: PointerEvent) => void;
 }
 
-export const Drag: React.FC<IDragProps> = (props) => {
-  console.log(props);
-  useDragState(props);
-  return <React.Fragment>{props.children}</React.Fragment>;
-};
+const moveEvent = fromEvent(window, "pointermove");
+const upEvent = fromEvent(window, "pointerup");
+const keyDownEvent = fromEvent<KeyboardEvent>(window, "keydown");
+const keyUpEvent = fromEvent<KeyboardEvent>(window, "keyup");
 
-const moveEvent = fromEvent(document, "pointermove");
-const upEvent = fromEvent(document, "pointer");
+export function useDragState(props: IDragWrapProps) {
+  const spaceKey = useRef<boolean>(false);
 
-export function useDragState(props: IDragProps) {
-  function listenEvent() {
-    if (props.domRef && props.domRef.current) {
-      return fromEvent<PointerEvent>(props.domRef.current, "pointerdown")
-        .pipe()
-        .subscribe((e) => console.log(e));
-    }
-  }
+  useEffect(listenKeyEvent, []);
 
   useEffect(() => {
     let refEvent: Subscription | undefined;
@@ -33,4 +27,39 @@ export function useDragState(props: IDragProps) {
       }
     };
   }, [props.domRef]);
+
+  function listenKeyEvent() {
+    const keyEvent = keyDownEvent
+      .pipe(
+        switchMap((e) => {
+          if (e.code === "Space") {
+            spaceKey.current = true;
+            if (props.useSpace && props.domRef.current) {
+              props.domRef.current.classList.add("in-drag");
+            }
+          }
+          return keyUpEvent;
+        }),
+        filter((e) => e.code === "Space"),
+      )
+      .subscribe(() => {
+        spaceKey.current = false;
+        if (props.domRef.current) {
+          props.domRef.current.classList.remove("in-drag");
+        }
+      });
+    return () => {
+      if (keyEvent) {
+        keyEvent.unsubscribe();
+      }
+    };
+  }
+
+  function listenEvent() {
+    if (props.domRef && props.domRef.current) {
+      return fromEvent<PointerEvent>(props.domRef.current, "pointerdown")
+        .pipe()
+        .subscribe((e) => console.log(e));
+    }
+  }
 }

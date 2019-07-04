@@ -1,52 +1,47 @@
-import React, { useReducer, useRef } from "react";
-import { Drag } from "./Components/Drag";
-import { ZoomWrap } from "./Components/Zoom";
-import {
-  EditorSizeActionType,
-  EditorTransformActionType,
-} from "./types/Editor";
+import React, { useReducer, useRef, useState } from "react";
+import { useDragState } from "./Components/Drag";
+import { useZoomState } from "./Components/Zoom";
+import { EditorSizeActionType, EditorTransformActionType } from "./types/Editor";
 import { ISize, ITransform } from "./types/index";
 import { Canvas } from "./Views/Canvas";
 import { Grid } from "./Views/Grid";
 import { NoZoomArea } from "./Views/NoZoomArea";
 
+const defaultTransform = { s: 1, x: 0, y: 0 };
+
 const Editor: React.FC<{}> = () => {
-  const {
-    editorContainerRef,
-    size,
+  const { editorContainerRef, size } = useEditorState();
+  const [transform, setTransform] = useState<ITransform>(defaultTransform);
+
+  useZoomState({
     transform,
-    transformDispatch,
-  } = useEditorState();
+    intensity: 0.1,
+    domRef: editorContainerRef,
+    onZoom: (trans) => setTransform(trans),
+  });
+
+  useDragState({
+    useSpace: true,
+    domRef: editorContainerRef,
+    onDrag: (e) => {
+      console.log(e);
+    },
+  });
+
   return (
-    <ZoomWrap
-      transform={transform}
-      onZoom={(trans) => transformDispatch({ payload: trans })}
+    <div
+      className="editor-container"
+      ref={(ref) => {
+        if (ref) {
+          editorContainerRef.current = ref;
+        }
+      }}
     >
-      <Drag
-        domRef={editorContainerRef}
-        onDrag={(e) => {
-          console.log("in drag");
-        }}
-      >
-        <div
-          className="editor-container"
-          ref={(ref) => {
-            if (ref) {
-              editorContainerRef.current = ref;
-            }
-          }}
-        >
-          <NoZoomArea
-            width={size.width}
-            height={size.height}
-            transform={transform}
-          >
-            <Grid scale={transform.s} />
-          </NoZoomArea>
-          <Canvas />
-        </div>
-      </Drag>
-    </ZoomWrap>
+      <NoZoomArea width={size.width} height={size.height} transform={transform}>
+        <Grid scale={transform.s} />
+      </NoZoomArea>
+      <Canvas />
+    </div>
   );
 };
 
@@ -58,11 +53,7 @@ export function useEditorState() {
     width: 800,
     height: 400,
   });
-  const [transform, transformDispatch] = useReducer(transformReducer, {
-    s: 1,
-    x: 0,
-    y: 0,
-  });
+  const [transform, transformDispatch] = useReducer(transformReducer, defaultTransform);
 
   return {
     editorContainerRef,
@@ -79,6 +70,8 @@ export function sizeReducer(state: ISize, action: EditorSizeActionType): ISize {
       return { ...state, height: action.payload };
     case "SET_WIDTH":
       return { ...state, width: action.payload };
+    case "SET_SIZE":
+      return { ...action.payload };
     default:
       return state;
   }

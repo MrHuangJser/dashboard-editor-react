@@ -4,6 +4,8 @@ import { INoZoomAreaProps } from "../types/NoZoomArea";
 export const NoZoomArea: React.FC<INoZoomAreaProps> = (props) => {
   const { width, height } = useNoZoomAreaState(props);
 
+  console.log(width, height);
+
   return (
     <div
       className="no-zoom-area"
@@ -27,7 +29,7 @@ export function useNoZoomAreaState(props: INoZoomAreaProps) {
       setWidth(props.width * props.transform.s);
       setHeight(props.height * props.transform.s);
     }
-  }, [props.transform]);
+  }, [props]);
 
   return {
     width,
