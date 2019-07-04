@@ -1,31 +1,51 @@
 import React, { useReducer, useRef } from "react";
+import { Drag } from "./Components/Drag";
 import { ZoomWrap } from "./Components/Zoom";
-import { EditorSizeActionType, EditorTransformActionType } from "./types/Editor";
+import {
+  EditorSizeActionType,
+  EditorTransformActionType,
+} from "./types/Editor";
 import { ISize, ITransform } from "./types/index";
 import { Canvas } from "./Views/Canvas";
 import { Grid } from "./Views/Grid";
 import { NoZoomArea } from "./Views/NoZoomArea";
 
 const Editor: React.FC<{}> = () => {
-  const { editorContainerRef, size, transform, transformDispatch } = useEditorState();
+  const {
+    editorContainerRef,
+    size,
+    transform,
+    transformDispatch,
+  } = useEditorState();
   return (
     <ZoomWrap
       transform={transform}
       onZoom={(trans) => transformDispatch({ payload: trans })}
     >
-      <div
-        className="editor-container"
-        ref={(ref) => {
-          if (ref) {
-            editorContainerRef.current = ref;
-          }
+      <Drag
+        domRef={editorContainerRef}
+        onDrag={(e) => {
+          console.log("in drag");
         }}
       >
-        <NoZoomArea width={size.width} height={size.height} transform={transform}>
-          <Grid scale={transform.s} />
-        </NoZoomArea>
-        <Canvas />
-      </div>
+        <div
+          className="editor-container"
+          ref={(ref) => {
+            if (ref) {
+              editorContainerRef.current = ref;
+            }
+          }}
+        >
+          <NoZoomArea
+            width={size.width}
+            height={size.height}
+            transform={transform}
+          >
+            <Grid scale={transform.s} />
+          </NoZoomArea>
+          <Canvas />
+        </div>
+      </Drag>
     </ZoomWrap>
   );
 };
@@ -34,7 +54,10 @@ export default Editor;
 
 export function useEditorState() {
   const editorContainerRef = useRef<HTMLElement>();
-  const [size, sizeDispatch] = useReducer(sizeReducer, { width: 800, height: 400 });
+  const [size, sizeDispatch] = useReducer(sizeReducer, {
+    width: 800,
+    height: 400,
+  });
   const [transform, transformDispatch] = useReducer(transformReducer, {
     s: 1,
     x: 0,
