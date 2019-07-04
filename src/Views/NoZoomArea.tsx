@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { INoZoomAreaProps } from "../types/NoZoomArea";
 
 export const NoZoomArea: React.FC<INoZoomAreaProps> = (props) => {

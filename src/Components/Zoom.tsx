@@ -38,6 +38,7 @@ export function useZoomState(props: IZoomWrapProps) {
       const delta = (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
       const ox = (transform.current.x - cx) * delta;
       const oy = (transform.current.y - cy) * delta;
+      console.log(`zooming`);
       onZoom({
         s: transform.current.s * (1 + delta),
         x: transform.current.x + ox,

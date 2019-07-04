@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { IGridProps } from "../types/Grid";
 
 export const Grid: React.FC<IGridProps> = (props) => {
-  const { width, height } = useGridState(props);
-
   return (
     <div className="grid-container">
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <pattern id="grid" width={width} height={height} patternUnits="userSpaceOnUse">
+          <pattern
+            id="grid"
+            width={10 * props.scale}
+            height={10 * props.scale}
+            patternUnits="userSpaceOnUse"
+          >
             <path
-              d={`M ${width} 0 L 0 0 0 ${height}`}
+              d={`M ${10 * props.scale} 0 L 0 0 0 ${10 * props.scale}`}
               fill="none"
               stroke="rgba(207, 207, 207, 0.8)"
               strokeWidth="1"
@@ -22,29 +25,3 @@ export const Grid: React.FC<IGridProps> = (props) => {
     </div>
   );
 };
-
-export function useGridState(props: IGridProps) {
-  const [width, setWidth] = useState(10);
-  const [height, setHeight] = useState(10);
-
-  function setSize(size: { width?: number; height?: number }) {
-    if (size.width) {
-      setWidth(size.width);
-    }
-    if (size.height) {
-      setHeight(size.height);
-    }
-  }
-
-  useEffect(() => {
-    if (props.scale !== undefined) {
-      setSize({ width: 10 * props.scale, height: 10 * props.scale });
-    }
-  }, [props.scale]);
-
-  return {
-    height,
-    setSize,
-    width,
-  };
-}
