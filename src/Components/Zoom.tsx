@@ -2,9 +2,11 @@ import { Component } from "react";
 import ReactDOM from "react-dom";
 import { fromEvent, Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
+import { ITransform } from "../types/index";
 
 export class ZoomWrap extends Component<{
-  onZoom?: (delta: number, ox: number, oy: number) => void;
+  transform: ITransform;
+  onZoom?: (transform: ITransform) => void;
   intensity?: number;
 }> {
   private domRef: HTMLElement | undefined;
@@ -30,17 +32,18 @@ export class ZoomWrap extends Component<{
     this.subscriptions.forEach((i) => i.unsubscribe());
   }
 
-  public componentWillReceiveProps(nextProps: any) {
-    console.log(nextProps);
-  }
-
   private wheel(ev: WheelEvent) {
-    const { intensity = 0.1, onZoom } = this.props;
+    const { intensity = 0.1, onZoom, transform } = this.props;
     ev.preventDefault();
     if (this.domRef && onZoom) {
+      const rect = this.domRef.getBoundingClientRect();
+      const cx = ev.clientX - rect.left;
+      const cy = ev.clientY - rect.top;
       const wheelDelta = (ev as any).wheelDelta as number;
       const delta = (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
-      onZoom(delta, ev.clientX, ev.clientY);
+      const ox = (transform.x - cx) * delta;
+      const oy = (transform.y - cy) * delta;
+      onZoom({ s: transform.s + delta, x: transform.x + ox, y: transform.y + oy });
     }
   }
 }

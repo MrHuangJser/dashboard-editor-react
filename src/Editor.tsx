@@ -2,6 +2,7 @@ import React, { useReducer, useRef } from "react";
 import { ZoomWrap } from "./Components/Zoom";
 import { EditorSizeActionType, EditorTransformActionType } from "./types/Editor";
 import { ISize, ITransform } from "./types/index";
+import { Canvas } from "./Views/Canvas";
 import { Grid } from "./Views/Grid";
 import { NoZoomArea } from "./Views/NoZoomArea";
 
@@ -9,9 +10,8 @@ const Editor: React.FC<{}> = () => {
   const { editorContainerRef, size, transform, transformDispatch } = useEditorState();
   return (
     <ZoomWrap
-      onZoom={(s, x, y) => {
-        console.log(s, x, y);
-      }}
+      transform={transform}
+      onZoom={(trans) => transformDispatch({ payload: trans })}
     >
       <div
         className="editor-container"
@@ -24,6 +24,7 @@ const Editor: React.FC<{}> = () => {
         <NoZoomArea width={size.width} height={size.height} transform={transform}>
           <Grid scale={transform.s} />
         </NoZoomArea>
+        <Canvas />
       </div>
     </ZoomWrap>
   );
