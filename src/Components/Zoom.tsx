@@ -40,10 +40,15 @@ export class ZoomWrap extends Component<{
       const cx = ev.clientX - rect.left;
       const cy = ev.clientY - rect.top;
       const wheelDelta = (ev as any).wheelDelta as number;
-      const delta = (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
+      const delta =
+        (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
       const ox = (transform.x - cx) * delta;
       const oy = (transform.y - cy) * delta;
-      onZoom({ s: transform.s + delta, x: transform.x + ox, y: transform.y + oy });
+      onZoom({
+        s: transform.s * (1 + delta),
+        x: transform.x + ox,
+        y: transform.y + oy,
+      });
     }
   }
 }
