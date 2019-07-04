@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
 import { ITransform } from "../types/index";
@@ -24,7 +24,6 @@ export function useZoomState(props: IZoomWrapProps) {
   }, []);
 
   useEffect(() => {
-    console.log(props.transform);
     transform.current = props.transform;
   }, [props]);
 
@@ -39,7 +38,6 @@ export function useZoomState(props: IZoomWrapProps) {
       const delta = (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
       const ox = (transform.current.x - cx) * delta;
       const oy = (transform.current.y - cy) * delta;
-      console.log(transform);
       onZoom({
         s: transform.current.s * (1 + delta),
         x: transform.current.x + ox,
