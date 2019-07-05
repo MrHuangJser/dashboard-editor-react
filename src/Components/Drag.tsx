@@ -4,7 +4,6 @@ import { filter, map, switchMap, takeUntil } from "rxjs/operators";
 
 export interface IDragWrapProps {
   domRef: MutableRefObject<HTMLElement | undefined>;
-  scale?: number;
   useSpace?: boolean;
 }
 
@@ -23,9 +22,9 @@ export const useDragState = (props: IDragWrapProps) => {
     my: 0,
   });
 
-  useEffect(listenKeyEvent, [props.scale, props.domRef]);
+  useEffect(listenKeyEvent, [props.domRef]);
 
-  useEffect(listenEvent, [props.scale, props.domRef]);
+  useEffect(listenEvent, [props.domRef]);
 
   return { dragStatus, moveState };
 
@@ -88,11 +87,10 @@ export const useDragState = (props: IDragWrapProps) => {
 
   function move(e: PointerEvent) {
     if (pointerStart) {
-      const { scale = 1 } = props;
       e.preventDefault();
       const [x, y] = [e.pageX, e.pageY];
       const delta = [x - pointerStart[0], y - pointerStart[1]];
-      setMoveState({ mx: delta[0] / scale, my: delta[1] / scale });
+      setMoveState({ mx: delta[0], my: delta[1] });
     }
   }
 
