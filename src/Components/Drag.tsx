@@ -23,9 +23,9 @@ export const useDragState = (props: IDragWrapProps) => {
     my: 0,
   });
 
-  useEffect(listenKeyEvent, []);
+  useEffect(listenKeyEvent, [props.scale, props.domRef]);
 
-  useEffect(listenEvent, []);
+  useEffect(listenEvent, [props.scale, props.domRef]);
 
   return { dragStatus, moveState };
 
