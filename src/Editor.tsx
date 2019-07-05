@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDragState } from "./Components/Drag";
 import { useZoomState } from "./Components/Zoom";
-import {
-  EditorSizeActionType,
-  EditorTransformActionType,
-} from "./types/Editor";
-import { ISize, ITransform } from "./types/index";
+import { ISize, ITransform } from "./types";
 import { Canvas } from "./Views/Canvas";
 import { Grid } from "./Views/Grid";
 import { NoZoomArea } from "./Views/NoZoomArea";

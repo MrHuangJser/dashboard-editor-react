@@ -1,7 +1,7 @@
 import { MutableRefObject, useEffect, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
-import { ITransform } from "../types/index";
+import { ITransform } from "../types";
 
 export interface IZoomWrapProps {
   transform: ITransform;
