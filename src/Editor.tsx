@@ -66,7 +66,6 @@ export function useEditorState() {
   }, [zoomTrans]);
 
   useEffect(() => {
-    console.log("dragStatus", dragStatus);
     if (dragStatus) {
       pointerStart = [transform.x, transform.y];
     } else {
