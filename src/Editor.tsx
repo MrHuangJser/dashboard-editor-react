@@ -1,32 +1,20 @@
-import React, { useReducer, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef } from "react";
 import { useDragState } from "./Components/Drag";
 import { useZoomState } from "./Components/Zoom";
-import { EditorSizeActionType, EditorTransformActionType } from "./types/Editor";
+import {
+  EditorSizeActionType,
+  EditorTransformActionType,
+} from "./types/Editor";
 import { ISize, ITransform } from "./types/index";
 import { Canvas } from "./Views/Canvas";
 import { Grid } from "./Views/Grid";
 import { NoZoomArea } from "./Views/NoZoomArea";
 
 const defaultTransform = { s: 1, x: 0, y: 0 };
+let pointerStart: [number, number] | null = null;
 
 const Editor: React.FC<{}> = () => {
-  const { editorContainerRef, size } = useEditorState();
-  const [transform, setTransform] = useState<ITransform>(defaultTransform);
-
-  useZoomState({
-    transform,
-    intensity: 0.1,
-    domRef: editorContainerRef,
-    onZoom: (trans) => setTransform(trans),
-  });
-
-  useDragState({
-    useSpace: true,
-    domRef: editorContainerRef,
-    onDrag: (e) => {
-      console.log(e);
-    },
-  });
+  const { editorContainerRef, size, transform } = useEditorState();
 
   return (
     <div
@@ -53,7 +41,50 @@ export function useEditorState() {
     width: 800,
     height: 400,
   });
-  const [transform, transformDispatch] = useReducer(transformReducer, defaultTransform);
+  const [transform, transformDispatch] = useReducer(
+    transformReducer,
+    defaultTransform,
+  );
+
+  const zoomTrans = useZoomState({
+    transform,
+    intensity: 0.1,
+    domRef: editorContainerRef,
+  });
+
+  const { moveState, dragStatus } = useDragState({
+    domRef: editorContainerRef,
+    scale: 1,
+    useSpace: true,
+  });
+
+  useEffect(() => {
+    const { s, ox, oy } = zoomTrans;
+    transformDispatch({
+      payload: { s, x: transform.x + ox, y: transform.y + oy },
+    });
+  }, [zoomTrans]);
+
+  useEffect(() => {
+    console.log("dragStatus", dragStatus);
+    if (dragStatus) {
+      pointerStart = [transform.x, transform.y];
+    } else {
+      pointerStart = null;
+    }
+  }, [dragStatus]);
+
+  useEffect(() => {
+    if (pointerStart) {
+      transformDispatch({
+        payload: {
+          ...transform,
+          x: pointerStart[0] + moveState.mx,
+          y: pointerStart[1] + moveState.my,
+        },
+      });
+    }
+  }, [moveState]);
 
   return {
     editorContainerRef,
