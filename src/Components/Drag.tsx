@@ -36,7 +36,6 @@ export const useDragState = (props: IDragWrapProps) => {
         switchMap(e => {
           if (e.code === "Space") {
             spaceKey.current = true;
-            setDragStatus("on-drag");
             if (props.useSpace && props.domRef.current) {
               props.domRef.current.classList.add("in-drag");
             }
