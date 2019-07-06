@@ -1,5 +1,5 @@
 import React, { MutableRefObject } from "react";
-import { useSelectAreaState } from "../Components/SelectArea";
+import { useSelectAreaState } from "../components/SelectArea";
 
 export const SelectAreaView: React.FC<{
   domRef: MutableRefObject<HTMLElement | undefined>;

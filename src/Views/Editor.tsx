@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDragState } from "../Components/Drag";
-import { useZoomState } from "../Components/Zoom";
+import { useDragState } from "../components/Drag";
+import { useZoomState } from "../components/Zoom";
 import { ISize, ITransform } from "../types";
-import { Canvas } from "../Views/Canvas";
-import { Grid } from "../Views/Grid";
-import { NoZoomArea } from "../Views/NoZoomArea";
-import { SelectAreaView } from "../Views/SelectArea";
-import { ZoomArea } from "../Views/ZoomArea";
+import { Canvas } from "./Canvas";
+import { Grid } from "./Grid";
+import { NoZoomArea } from "./NoZoomArea";
+import { SelectAreaView } from "./SelectArea";
+import { ZoomArea } from "./ZoomArea";
 
 const defaultTransform = { s: 1, x: 0, y: 0 };
 let pointerStart: [number, number] | null = null;
