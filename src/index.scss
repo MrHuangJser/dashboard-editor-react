@@ -1,5 +1,14 @@
-@import './styles/Editor.scss';
-@import './styles/Grid.scss';
-@import './styles/NoZoomArea.scss';
-@import './styles/Canvas.scss';
-@import './styles/SelectArea.scss';
+@import './styles/index.scss';
+
+.main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  .item-panel {
+    width: 300px;
+  }
+  .main-content {
+    flex: 1;
+    padding: 15px;
+  }
+}

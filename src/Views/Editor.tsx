@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDragState } from "../components/Drag";
 import { useZoomState } from "../components/Zoom";
+import { Editor } from "../core";
 import { ISize, ITransform } from "../types";
 import { Canvas } from "./Canvas";
 import { Grid } from "./Grid";
@@ -11,7 +12,7 @@ import { ZoomArea } from "./ZoomArea";
 const defaultTransform = { s: 1, x: 0, y: 0 };
 let pointerStart: [number, number] | null = null;
 
-const Editor: React.FC<{}> = () => {
+export const EditorView: React.FC<{ editor: Editor | null }> = () => {
   const { editorContainerRef, size, transform } = useEditorState();
 
   return (
@@ -33,8 +34,6 @@ const Editor: React.FC<{}> = () => {
     </div>
   );
 };
-
-export default Editor;
 
 export function useEditorState() {
   const editorContainerRef = useRef<HTMLElement>();
