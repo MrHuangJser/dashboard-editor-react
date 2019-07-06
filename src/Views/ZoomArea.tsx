@@ -5,7 +5,7 @@ export const ZoomArea: React.FC = ({ children }) => {
   const {
     size,
     transform: { s, x, y },
-  } = useMappedState(({ canvasSize, canvasTransform }) => ({
+  } = useMappedState(({ editorInstance: { canvasSize, canvasTransform } }) => ({
     size: canvasSize,
     transform: canvasTransform,
   }));

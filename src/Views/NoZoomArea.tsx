@@ -5,7 +5,7 @@ export const NoZoomArea: React.FC = (props) => {
   const {
     size: { width, height },
     transform,
-  } = useMappedState(({ canvasSize, canvasTransform }) => ({
+  } = useMappedState(({ editorInstance: { canvasSize, canvasTransform } }) => ({
     size: canvasSize,
     transform: canvasTransform,
   }));

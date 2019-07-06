@@ -3,6 +3,7 @@ import { useDragState } from "../components/Drag";
 import { useZoomState } from "../components/Zoom";
 import { Editor } from "../core";
 import { makeStore, StoreContext, useDispatch, useMappedState } from "../utils";
+import { INITIAL_STATE } from "../utils/store";
 import { Canvas } from "./Canvas";
 import { Grid } from "./Grid";
 import { NoZoomArea } from "./NoZoomArea";
@@ -35,7 +36,7 @@ export const Content: React.FC = () => {
 };
 
 export const EditorView = (props: { editor: Editor | null }) => {
-  const [store, setStore] = useState(makeStore());
+  const [store, setStore] = useState(makeStore(INITIAL_STATE));
 
   useEffect(() => {
     if (props.editor) {
@@ -60,7 +61,7 @@ export function useEditorState() {
   const editorContainerRef = useRef<HTMLElement>();
   const dispatch = useDispatch();
   const { transform } = useMappedState((state) => ({
-    transform: state.canvasTransform,
+    transform: state.editorInstance.canvasTransform,
   }));
 
   const zoomTrans = useZoomState({

@@ -2,9 +2,11 @@ import React from "react";
 import { useMappedState } from "../utils";
 
 export const Grid: React.FC = () => {
-  const { scale } = useMappedState(({ canvasTransform }) => ({
-    scale: canvasTransform.s,
-  }));
+  const { scale } = useMappedState(
+    ({ editorInstance: { canvasTransform } }) => ({
+      scale: canvasTransform.s,
+    }),
+  );
 
   return (
     <div className="grid-container">

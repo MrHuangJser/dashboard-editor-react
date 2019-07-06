@@ -5,7 +5,6 @@ import { ItemView } from "./Item";
 
 export const Canvas = () => {
   const { size, items, editor } = useCanvasState();
-  console.log(items, editor);
 
   return (
     <div
@@ -24,10 +23,10 @@ function ItemsRender(items: Item[]) {
 export function useCanvasState() {
   const dispatch = useDispatch();
   const { editor, size, items: itemList } = useMappedState(
-    ({ canvasSize, items, editorInstance }) => ({
-      items,
-      size: canvasSize,
+    ({ editorInstance }) => ({
       editor: editorInstance,
+      items: editorInstance.items,
+      size: editorInstance.canvasSize,
     }),
   );
 

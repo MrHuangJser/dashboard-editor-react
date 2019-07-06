@@ -14,43 +14,27 @@ export function reducer(
   state: IState = INITIAL_STATE,
   action: IAction,
 ): IState {
-  const { editorInstance, items } = state;
+  const { editorInstance } = state;
+  const { items } = editorInstance;
   switch (action.type) {
-    case "INITIAL_EDITOR":
-      return { ...state, editorInstance: action.payload };
     case "SET_CANVAS_TRANSFORM":
-      if (editorInstance) {
-        editorInstance.canvasTransform = action.payload;
-      }
-      return {
-        ...state,
-        canvasTransform: action.payload,
-      };
+      editorInstance.canvasTransform = action.payload;
+      break;
     case "SET_CANVAS_SIZE":
-      if (editorInstance) {
-        editorInstance.canvasSize = action.payload;
-      }
-      return {
-        ...state,
-        canvasSize: action.payload,
-      };
+      editorInstance.canvasSize = action.payload;
+      break;
     case "ADD_ITEM":
-      if (editorInstance) {
-        editorInstance.items = [...items, action.payload];
-      }
-      return { ...state, items: editorInstance ? editorInstance.items : [] };
+      editorInstance.items = [...items, action.payload];
+      break;
     case "TRANSLATE_ITEM":
-      if (editorInstance) {
-        editorInstance.items = items.map((item) => {
-          if (item.id === action.payload.id) {
-            item.transform.x = action.payload.x;
-            item.transform.y = action.payload.y;
-          }
-          return item;
-        });
-      }
-      return { ...state, items: editorInstance ? editorInstance.items : [] };
-    default:
-      return state;
+      editorInstance.items = items.map((item) => {
+        if (item.id === action.payload.id) {
+          item.transform.x = action.payload.x;
+          item.transform.y = action.payload.y;
+        }
+        return item;
+      });
+      break;
   }
+  return { ...state };
 }

@@ -1,21 +1,14 @@
 import { createStore, Store } from "redux";
 import { create } from "redux-react-hook";
-import { Editor, Item } from "../core";
-import { ISize, ITransform } from "../types";
+import { Editor } from "../core";
 import { IAction, reducer } from "./reducer";
 
 export interface IState {
-  editorInstance: Editor | null;
-  canvasSize: ISize;
-  canvasTransform: ITransform;
-  items: Item[];
+  editorInstance: Editor;
 }
 
 export const INITIAL_STATE: IState = {
-  editorInstance: null,
-  canvasSize: { width: 800, height: 400 },
-  canvasTransform: { s: 1, x: 0, y: 0 },
-  items: [],
+  editorInstance: new Editor(),
 };
 
 export function makeStore(state?: any): Store<IState, IAction> {
