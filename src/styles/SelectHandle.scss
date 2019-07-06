@@ -54,7 +54,7 @@
     .tl,
     .t,
     .tr {
-      top: -3px;
+      top: -4px;
       &.resizable-handler {
         top: -7px;
       }
@@ -62,7 +62,7 @@
     .bl,
     .b,
     .br {
-      bottom: -3px;
+      bottom: -6px;
       &.resizable-handler {
         bottom: -7px;
       }
@@ -78,7 +78,7 @@
     .br,
     .r,
     .tr {
-      right: -3px;
+      right: -6px;
       &.resizable-handler {
         right: -7px;
       }
@@ -86,7 +86,7 @@
     .tl,
     .l,
     .bl {
-      left: -3px;
+      left: -4px;
       &.resizable-handler {
         left: -7px;
       }
