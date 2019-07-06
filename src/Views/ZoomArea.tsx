@@ -1,10 +1,15 @@
 import React from "react";
-import { ISize, ITransform } from "../types";
+import { useMappedState } from "../utils";
 
-export const ZoomArea: React.FC<{
-  size: ISize;
-  transform: ITransform;
-}> = ({ size, transform: { s, x, y }, children }) => {
+export const ZoomArea: React.FC = ({ children }) => {
+  const {
+    size,
+    transform: { s, x, y },
+  } = useMappedState(({ canvasSize, canvasTransform }) => ({
+    size: canvasSize,
+    transform: canvasTransform,
+  }));
+
   return (
     <div
       className="zoom-area"

@@ -2,18 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDragState } from "../components/Drag";
 import { useZoomState } from "../components/Zoom";
 import { Editor } from "../core";
-import { ISize, ITransform } from "../types";
+import { makeStore, StoreContext, useDispatch, useMappedState } from "../utils";
 import { Canvas } from "./Canvas";
 import { Grid } from "./Grid";
 import { NoZoomArea } from "./NoZoomArea";
 import { SelectAreaView } from "./SelectArea";
 import { ZoomArea } from "./ZoomArea";
 
-const defaultTransform = { s: 1, x: 0, y: 0 };
 let pointerStart: [number, number] | null = null;
 
-export const EditorView: React.FC<{ editor: Editor | null }> = () => {
-  const { editorContainerRef, size, transform } = useEditorState();
+export const Content: React.FC = () => {
+  const { editorContainerRef } = useEditorState();
 
   return (
     <div
@@ -24,24 +23,39 @@ export const EditorView: React.FC<{ editor: Editor | null }> = () => {
         }
       }}
     >
-      <NoZoomArea width={size.width} height={size.height} transform={transform}>
-        <Grid scale={transform.s} />
+      <NoZoomArea>
+        <Grid />
       </NoZoomArea>
-      <ZoomArea size={size} transform={transform}>
-        <Canvas size={size} />
+      <ZoomArea>
+        <Canvas />
       </ZoomArea>
       <SelectAreaView domRef={editorContainerRef} />
     </div>
   );
 };
 
+export const EditorView = (props: { editor: Editor | null }) => {
+  const [store, setStore] = useState(makeStore());
+
+  useEffect(() => {
+    if (props.editor) {
+      setStore(makeStore({ editorInstance: props.editor }));
+    }
+  }, [props.editor]);
+
+  return (
+    <StoreContext.Provider value={store}>
+      <Content />
+    </StoreContext.Provider>
+  );
+};
+
 export function useEditorState() {
   const editorContainerRef = useRef<HTMLElement>();
-  const [size, setSize] = useState<ISize>({
-    width: 800,
-    height: 400,
-  });
-  const [transform, setTransform] = useState<ITransform>(defaultTransform);
+  const dispatch = useDispatch();
+  const { transform } = useMappedState((state) => ({
+    transform: state.canvasTransform,
+  }));
 
   const zoomTrans = useZoomState({
     transform,
@@ -56,7 +70,10 @@ export function useEditorState() {
 
   useEffect(() => {
     const { s, ox, oy } = zoomTrans;
-    setTransform({ s, x: transform.x + ox, y: transform.y + oy });
+    dispatch({
+      type: "SET_CANVAS_TRANSFORM",
+      payload: { s, x: transform.x + ox, y: transform.y + oy },
+    });
   }, [zoomTrans]);
 
   useEffect(() => {
@@ -69,19 +86,16 @@ export function useEditorState() {
 
   useEffect(() => {
     if (pointerStart) {
-      setTransform({
-        ...transform,
-        x: pointerStart[0] + moveState.mx,
-        y: pointerStart[1] + moveState.my,
+      dispatch({
+        type: "SET_CANVAS_TRANSFORM",
+        payload: {
+          ...transform,
+          x: pointerStart[0] + moveState.mx,
+          y: pointerStart[1] + moveState.my,
+        },
       });
     }
   }, [moveState]);
 
-  return {
-    editorContainerRef,
-    size,
-    setSize,
-    transform,
-    setTransform,
-  };
+  return { editorContainerRef };
 }

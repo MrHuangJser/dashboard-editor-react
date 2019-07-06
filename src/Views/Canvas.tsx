@@ -1,7 +1,11 @@
 import React from "react";
-import { ICanvasProps } from "../types/Canvas";
+import { Editor } from "../core";
+import { useDispatch, useMappedState } from "../utils";
+import { ItemView } from "./Item";
 
-export const Canvas: React.FC<ICanvasProps> = ({ size }) => {
+export const Canvas = () => {
+  const { size } = useCanvasState();
+
   return (
     <div
       className="canvas"
@@ -9,3 +13,19 @@ export const Canvas: React.FC<ICanvasProps> = ({ size }) => {
     />
   );
 };
+
+function ItemsRender(editor: Editor | null) {
+  console.log(editor);
+  if (editor) {
+    return editor.items.map((item, index) => (
+      <ItemView key={item.id} item={item} />
+    ));
+  }
+}
+
+export function useCanvasState() {
+  const dispatch = useDispatch();
+  const { size } = useMappedState(({ canvasSize }) => ({ size: canvasSize }));
+
+  return { size };
+}

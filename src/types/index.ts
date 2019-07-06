@@ -4,6 +4,3 @@ export interface IActionType<T, P> {
 }
 
 export * from "./Editor";
-export * from "./Grid";
-export * from "./NoZoomArea";
-export * from "./Canvas";

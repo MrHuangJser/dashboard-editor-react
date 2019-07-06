@@ -1,16 +1,21 @@
 import React from "react";
-import { INoZoomAreaProps } from "../types/NoZoomArea";
+import { useMappedState } from "../utils";
 
-export const NoZoomArea: React.FC<INoZoomAreaProps> = (props) => {
+export const NoZoomArea: React.FC = (props) => {
+  const {
+    size: { width, height },
+    transform,
+  } = useMappedState(({ canvasSize, canvasTransform }) => ({
+    size: canvasSize,
+    transform: canvasTransform,
+  }));
   return (
     <div
       className="no-zoom-area"
       style={{
-        width: `${props.width * props.transform.s}px`,
-        height: `${props.height * props.transform.s}px`,
-        transform: `translate3d(${props.transform.x}px,${
-          props.transform.y
-        }px,0)`,
+        width: `${width * transform.s}px`,
+        height: `${height * transform.s}px`,
+        transform: `translate3d(${transform.x}px,${transform.y}px,0)`,
       }}
     >
       {props.children}
