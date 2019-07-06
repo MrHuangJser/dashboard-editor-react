@@ -18,6 +18,7 @@
   .rect {
     position: absolute;
     border: none;
+    pointer-events: none;
     .rotate {
       position: absolute;
       left: 50%;
