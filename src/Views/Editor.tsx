@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDragState } from "../components/Drag";
-import { useZoomState } from "../components/Zoom";
+import { useDragState, useZoomState } from "../components";
 import { Editor } from "../core";
-import { makeStore, StoreContext, useDispatch, useMappedState } from "../utils";
-import { INITIAL_STATE } from "../utils/store";
+import {
+  INITIAL_STATE,
+  makeStore,
+  StoreContext,
+  useDispatch,
+  useMappedState
+} from "../utils";
+import { BorderArea } from "./BorderArea";
 import { Canvas } from "./Canvas";
 import { Grid } from "./Grid";
 import { NoZoomArea } from "./NoZoomArea";
@@ -18,7 +23,7 @@ export const Content: React.FC = () => {
   return (
     <div
       className="editor-container"
-      ref={(ref) => {
+      ref={ref => {
         if (ref) {
           editorContainerRef.current = ref;
         }
@@ -30,6 +35,9 @@ export const Content: React.FC = () => {
       <ZoomArea>
         <Canvas />
       </ZoomArea>
+      <NoZoomArea>
+        <BorderArea />
+      </NoZoomArea>
       <SelectAreaView domRef={editorContainerRef} />
     </div>
   );
@@ -44,8 +52,8 @@ export const EditorView = (props: { editor: Editor | null }) => {
         makeStore({
           editorInstance: props.editor,
           canvasSize: props.editor.canvasSize,
-          canvasTransform: props.editor.canvasTransform,
-        }),
+          canvasTransform: props.editor.canvasTransform
+        })
       );
     }
   }, [props.editor]);
@@ -60,26 +68,26 @@ export const EditorView = (props: { editor: Editor | null }) => {
 export function useEditorState() {
   const editorContainerRef = useRef<HTMLElement>();
   const dispatch = useDispatch();
-  const { transform } = useMappedState((state) => ({
-    transform: state.editorInstance.canvasTransform,
+  const { transform } = useMappedState(state => ({
+    transform: state.editorInstance.canvasTransform
   }));
 
   const zoomTrans = useZoomState({
     transform,
     intensity: 0.1,
-    domRef: editorContainerRef,
+    domRef: editorContainerRef
   });
 
   const { moveState, dragStatus } = useDragState({
     domRef: editorContainerRef,
-    useSpace: true,
+    useSpace: true
   });
 
   useEffect(() => {
     const { s, ox, oy } = zoomTrans;
     dispatch({
       type: "SET_CANVAS_TRANSFORM",
-      payload: { s, x: transform.x + ox, y: transform.y + oy },
+      payload: { s, x: transform.x + ox, y: transform.y + oy }
     });
   }, [zoomTrans]);
 
@@ -98,8 +106,8 @@ export function useEditorState() {
         payload: {
           ...transform,
           x: pointerStart[0] + moveState.mx,
-          y: pointerStart[1] + moveState.my,
-        },
+          y: pointerStart[1] + moveState.my
+        }
       });
     }
   }, [moveState]);

@@ -1,10 +1,15 @@
 import React, { useEffect, useRef } from "react";
+import { MutableRefObject } from "react";
+import { fromEvent, Subscription } from "rxjs";
+import { switchMap } from "rxjs/operators";
 import { useDragState } from "../components";
 import { Item } from "../core";
-import { useDispatch } from "../utils";
+import { useDispatch, useMappedState } from "../utils";
 import { Widgets } from "../widgets";
 
-export const ItemView: React.FC<{ item: Item }> = (props) => {
+let pointerStart: [number, number] | null = null;
+
+export const ItemView: React.FC<{ item: Item }> = props => {
   const Widget = Widgets[props.item.type];
   const { item } = props;
   const { domRef } = useItemState(props);
@@ -12,7 +17,7 @@ export const ItemView: React.FC<{ item: Item }> = (props) => {
   return (
     <div
       className="item-view"
-      ref={(ref) => {
+      ref={ref => {
         if (ref) {
           domRef.current = ref;
         }
@@ -22,7 +27,7 @@ export const ItemView: React.FC<{ item: Item }> = (props) => {
         height: `${item.size.height}px`,
         transform: `translate3d(${item.transform.x}px,${
           item.transform.y
-        }px,0) rotate(${item.transform.r})`,
+        }px,0) rotate(${item.transform.r})`
       }}
     >
       <Widget {...item.props} />
@@ -30,13 +35,24 @@ export const ItemView: React.FC<{ item: Item }> = (props) => {
   );
 };
 
-let pointerStart: [number, number] | null = null;
-
 function useItemState(props: { item: Item }) {
-  const dispatch = useDispatch();
   const domRef = useRef<HTMLElement | undefined>();
+  const { scale } = useMappedState(({ editorInstance }) => ({
+    scale: editorInstance.canvasTransform.s
+  }));
+  useDragEvent({ domRef, item: props.item, scale });
+  useHoverEvent({ domRef, item: props.item });
 
-  const { dragStatus, moveState } = useDragState({ domRef });
+  return { domRef };
+}
+
+function useDragEvent(props: {
+  item: Item;
+  domRef: MutableRefObject<HTMLElement | undefined>;
+  scale: number;
+}) {
+  const dispatch = useDispatch();
+  const { dragStatus, moveState } = useDragState({ domRef: props.domRef });
 
   useEffect(() => {
     pointerStart = dragStatus
@@ -50,12 +66,40 @@ function useItemState(props: { item: Item }) {
         type: "TRANSLATE_ITEM",
         payload: {
           id: props.item.id,
-          x: pointerStart[0] + moveState.mx,
-          y: pointerStart[1] + moveState.my,
-        },
+          x: pointerStart[0] + moveState.mx / props.scale,
+          y: pointerStart[1] + moveState.my / props.scale
+        }
       });
     }
   }, [moveState]);
+}
 
-  return { domRef };
+function useHoverEvent(props: {
+  item: Item;
+  domRef: MutableRefObject<HTMLElement | undefined>;
+}) {
+  const dispatch = useDispatch();
+  const { domRef, item } = props;
+
+  useEffect(() => {
+    let event: Subscription;
+    if (domRef.current) {
+      event = fromEvent<PointerEvent>(domRef.current, "pointerover")
+        .pipe(
+          switchMap(() => {
+            dispatch({ type: "ADD_ITEM_BORDER", payload: item });
+            return fromEvent<PointerEvent>(
+              domRef.current as HTMLElement,
+              "pointerout"
+            );
+          })
+        )
+        .subscribe(() => {
+          dispatch({ type: "REMOVE_ITEM_BORDER", payload: item });
+        });
+    }
+    return () => {
+      event.unsubscribe();
+    };
+  }, [domRef]);
 }
