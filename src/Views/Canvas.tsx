@@ -1,31 +1,43 @@
-import React from "react";
-import { Editor } from "../core";
+import React, { useEffect } from "react";
+import { Item } from "../core";
 import { useDispatch, useMappedState } from "../utils";
 import { ItemView } from "./Item";
 
 export const Canvas = () => {
-  const { size } = useCanvasState();
+  const { size, items, editor } = useCanvasState();
+  console.log(items, editor);
 
   return (
     <div
       className="canvas"
       style={{ width: `${size.width}px`, height: `${size.height}px` }}
-    />
+    >
+      {ItemsRender(items)}
+    </div>
   );
 };
 
-function ItemsRender(editor: Editor | null) {
-  console.log(editor);
-  if (editor) {
-    return editor.items.map((item, index) => (
-      <ItemView key={item.id} item={item} />
-    ));
-  }
+function ItemsRender(items: Item[]) {
+  return items.map((item, index) => <ItemView key={item.id} item={item} />);
 }
 
 export function useCanvasState() {
   const dispatch = useDispatch();
-  const { size } = useMappedState(({ canvasSize }) => ({ size: canvasSize }));
+  const { editor, size, items: itemList } = useMappedState(
+    ({ canvasSize, items, editorInstance }) => ({
+      items,
+      size: canvasSize,
+      editor: editorInstance,
+    }),
+  );
 
-  return { size };
+  useEffect(() => {
+    if (editor) {
+      editor.on("addItem").subscribe((res) => {
+        dispatch({ type: "ADD_ITEM", payload: res });
+      });
+    }
+  }, [editor]);
+
+  return { editor, size, items: itemList };
 }

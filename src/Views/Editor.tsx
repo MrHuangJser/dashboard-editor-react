@@ -39,7 +39,13 @@ export const EditorView = (props: { editor: Editor | null }) => {
 
   useEffect(() => {
     if (props.editor) {
-      setStore(makeStore({ editorInstance: props.editor }));
+      setStore(
+        makeStore({
+          editorInstance: props.editor,
+          canvasSize: props.editor.canvasSize,
+          canvasTransform: props.editor.canvasTransform,
+        }),
+      );
     }
   }, [props.editor]);
 

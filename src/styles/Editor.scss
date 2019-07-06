@@ -11,17 +11,13 @@
       cursor: grabbing;
     }
   }
-  .editor-canvas {
+  .no-zoom-area,
+  .zoom-area {
     position: absolute;
     transform-origin: 0 0;
-    .no-zoom-area,
-    .zoom-area {
-      position: absolute;
-      transform-origin: 0 0;
-    }
-    .item-view {
-      position: absolute;
-      transform-origin: center;
-    }
+  }
+  .item-view {
+    position: absolute;
+    transform-origin: center;
   }
 }
