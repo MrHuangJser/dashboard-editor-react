@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Editor from "./Editor";
 import "./index.scss";
 import * as serviceWorker from "./serviceWorker";
+import Editor from "./utils/Editor";
 
 ReactDOM.render(<Editor />, document.getElementById("root"));
 
