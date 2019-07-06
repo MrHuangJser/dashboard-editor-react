@@ -1,9 +1,8 @@
-import { Editor, Item } from "../core";
+import { Item } from "../core";
 import { ISize, ITransform } from "../types";
 import { INITIAL_STATE, IState } from "./store";
 
 export type IAction =
-  | { type: "INITIAL_EDITOR"; payload: Editor }
   | { type: "SET_CANVAS_TRANSFORM"; payload: ITransform }
   | { type: "SET_CANVAS_SIZE"; payload: ISize }
   | { type: "ADD_ITEM"; payload: Item }

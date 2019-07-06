@@ -16,10 +16,12 @@ let pointerStart: [number, number] | null = null;
 
 export const useDragState = (props: IDragWrapProps) => {
   const spaceKey = useRef<boolean>(false);
-  const [dragStatus, setDragStatus] = useState<boolean | null>(null);
+  const [dragStatus, setDragStatus] = useState<"on-drag" | "in-drag" | null>(
+    null
+  );
   const [moveState, setMoveState] = useState<{ mx: number; my: number }>({
     mx: 0,
-    my: 0,
+    my: 0
   });
 
   useEffect(listenKeyEvent, [props.domRef]);
@@ -31,19 +33,21 @@ export const useDragState = (props: IDragWrapProps) => {
   function listenKeyEvent() {
     const keyEvent = keyDownEvent
       .pipe(
-        switchMap((e) => {
+        switchMap(e => {
           if (e.code === "Space") {
             spaceKey.current = true;
+            setDragStatus("on-drag");
             if (props.useSpace && props.domRef.current) {
               props.domRef.current.classList.add("in-drag");
             }
           }
           return keyUpEvent;
         }),
-        filter((e) => e.code === "Space"),
+        filter(e => e.code === "Space")
       )
       .subscribe(() => {
         spaceKey.current = false;
+        setDragStatus(null);
         if (props.domRef.current) {
           props.domRef.current.classList.remove("in-drag");
         }
@@ -61,13 +65,13 @@ export const useDragState = (props: IDragWrapProps) => {
       refEvent = fromEvent<PointerEvent>(props.domRef.current, "pointerdown")
         .pipe(
           filter(() => (props.useSpace ? spaceKey.current : !spaceKey.current)),
-          switchMap((e) => {
+          switchMap(e => {
             down(e);
-            return moveEvent.pipe(takeUntil(upEvent.pipe(map((ev) => up()))));
+            return moveEvent.pipe(takeUntil(upEvent.pipe(map(ev => up()))));
           }),
-          filter(() => (props.useSpace ? spaceKey.current : !spaceKey.current)),
+          filter(() => (props.useSpace ? spaceKey.current : !spaceKey.current))
         )
-        .subscribe((e) => move(e));
+        .subscribe(e => move(e));
     }
     return () => {
       if (refEvent) {
@@ -83,7 +87,7 @@ export const useDragState = (props: IDragWrapProps) => {
     if (props.domRef && props.domRef.current) {
       props.domRef.current.classList.add("on-drag");
     }
-    setDragStatus(true);
+    setDragStatus("on-drag");
   }
 
   function move(e: PointerEvent) {
@@ -102,7 +106,7 @@ export const useDragState = (props: IDragWrapProps) => {
       if (props.domRef && props.domRef.current) {
         props.domRef.current.classList.remove("on-drag");
       }
-      setDragStatus(false);
+      setDragStatus(null);
     }
   }
 };
