@@ -5,7 +5,7 @@ import {
   useState,
 } from "react";
 import { fromEvent, Subscription } from "rxjs";
-import { map, switchMap, takeUntil } from "rxjs/operators";
+import { filter, map, switchMap, takeUntil } from "rxjs/operators";
 
 export interface ISelectAreaProps
   extends PropsWithChildren<{
@@ -38,6 +38,14 @@ export const useSelectAreaState = (props: ISelectAreaProps) => {
         "pointerdown",
       )
         .pipe(
+          filter(
+            () =>
+              !!(
+                props.domRef &&
+                props.domRef.current &&
+                !props.domRef.current.classList.contains("in-drag")
+              ),
+          ),
           switchMap((e) => {
             down(e);
             return moveEvent.pipe(takeUntil(upEvent.pipe(map((ev) => up(ev)))));

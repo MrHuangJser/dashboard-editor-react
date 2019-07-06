@@ -78,6 +78,7 @@ export const useDragState = (props: IDragWrapProps) => {
 
   function down(e: PointerEvent) {
     e.stopPropagation();
+    e.preventDefault();
     pointerStart = [e.pageX, e.pageY];
     if (props.domRef && props.domRef.current) {
       props.domRef.current.classList.add("on-drag");
@@ -87,6 +88,7 @@ export const useDragState = (props: IDragWrapProps) => {
 
   function move(e: PointerEvent) {
     if (pointerStart) {
+      e.stopPropagation();
       e.preventDefault();
       const [x, y] = [e.pageX, e.pageY];
       const delta = [x - pointerStart[0], y - pointerStart[1]];
