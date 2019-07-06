@@ -58,6 +58,9 @@ function useDragEvent(props: {
     pointerStart = dragStatus
       ? [props.item.transform.x, props.item.transform.y]
       : null;
+    if (dragStatus === "on-drag") {
+      dispatch({ type: "SELECT_ITEM", payload: props.item });
+    }
   }, [dragStatus]);
 
   useEffect(() => {
@@ -78,8 +81,11 @@ function useHoverEvent(props: {
   item: Item;
   domRef: MutableRefObject<HTMLElement | undefined>;
 }) {
-  const dispatch = useDispatch();
   const { domRef, item } = props;
+  const { selected } = useMappedState(({ editorInstance }) => ({
+    selected: editorInstance.selected
+  }));
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let event: Subscription;
@@ -95,7 +101,9 @@ function useHoverEvent(props: {
           })
         )
         .subscribe(() => {
-          dispatch({ type: "REMOVE_ITEM_BORDER", payload: item });
+          if (!selected.contains(item)) {
+            dispatch({ type: "REMOVE_ITEM_BORDER", payload: item });
+          }
         });
     }
     return () => {

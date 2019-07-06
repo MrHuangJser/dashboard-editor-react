@@ -10,7 +10,8 @@ export type IAction =
   | { type: "ROTATE_ITEM"; payload: { id: string; r: number } }
   | { type: "ADD_ITEM_BORDER"; payload: Item }
   | { type: "REMOVE_ITEM_BORDER"; payload: Item }
-  | { type: "CLEAR_ITEM_BORDER"; payload: undefined };
+  | { type: "CLEAR_ITEM_BORDER"; payload: undefined }
+  | { type: "SELECT_ITEM"; payload: Item };
 
 export function reducer(
   state: IState = INITIAL_STATE,
@@ -26,6 +27,8 @@ export function reducer(
       editorInstance.canvasSize = action.payload;
       break;
     case "ADD_ITEM":
+      editorInstance.selected.clear();
+      state.bordered.clear();
       editorInstance.items = [...items, action.payload];
       break;
     case "TRANSLATE_ITEM":
@@ -45,6 +48,11 @@ export function reducer(
       break;
     case "CLEAR_ITEM_BORDER":
       bordered.clear();
+      break;
+    case "SELECT_ITEM":
+      bordered.clear();
+      editorInstance.selected.add(action.payload);
+      bordered.add(action.payload);
       break;
   }
   return { ...state };
