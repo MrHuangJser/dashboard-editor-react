@@ -17,7 +17,7 @@ export function reducer(
   state: IState = INITIAL_STATE,
   action: IAction
 ): IState {
-  const { editorInstance, bordered } = state;
+  const { editorInstance, bordered, selected } = state;
   const { items } = editorInstance;
   switch (action.type) {
     case "SET_CANVAS_TRANSFORM":
@@ -27,7 +27,7 @@ export function reducer(
       editorInstance.canvasSize = action.payload;
       break;
     case "ADD_ITEM":
-      editorInstance.selected.clear();
+      selected.clear();
       state.bordered.clear();
       editorInstance.items = [...items, action.payload];
       break;
@@ -51,7 +51,8 @@ export function reducer(
       break;
     case "SELECT_ITEM":
       bordered.clear();
-      editorInstance.selected.add(action.payload);
+      selected.clear();
+      selected.add(action.payload);
       bordered.add(action.payload);
       break;
   }

@@ -1,0 +1,98 @@
+.select-handle {
+  position: absolute;
+  z-index: 2;
+  * {
+    pointer-events: auto;
+  }
+  .square {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: white;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(235, 86, 72);
+    border-image: initial;
+    border-radius: 1px;
+  }
+  .rect {
+    position: absolute;
+    border: none;
+    .rotate {
+      position: absolute;
+      left: 50%;
+      top: -26px;
+      width: 18px;
+      height: 18px;
+      margin-left: -9px;
+      display: flex;
+      -webkit-box-pack: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      align-items: center;
+      cursor: pointer;
+      path {
+        fill: #298df8;
+      }
+    }
+    .resizable-handler {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .t,
+    .b {
+      left: 50%;
+      margin-left: -3px;
+      &.resizable-handler {
+        margin-left: -7px;
+      }
+    }
+    .tl,
+    .t,
+    .tr {
+      top: -3px;
+      &.resizable-handler {
+        top: -7px;
+      }
+    }
+    .bl,
+    .b,
+    .br {
+      bottom: -3px;
+      &.resizable-handler {
+        bottom: -7px;
+      }
+    }
+    .l,
+    .r {
+      top: 50%;
+      margin-top: -3px;
+      &.resizable-handler {
+        margin-top: -7px;
+      }
+    }
+    .br,
+    .r,
+    .tr {
+      right: -3px;
+      &.resizable-handler {
+        right: -7px;
+      }
+    }
+    .tl,
+    .l,
+    .bl {
+      left: -3px;
+      &.resizable-handler {
+        left: -7px;
+      }
+    }
+    .square {
+      border-radius: 50%;
+      border-color: #298df8;
+    }
+  }
+}

@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import { MutableRefObject } from "react";
+import React, { MutableRefObject, useEffect, useRef } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import { useDragState } from "../components";
@@ -82,8 +81,8 @@ function useHoverEvent(props: {
   domRef: MutableRefObject<HTMLElement | undefined>;
 }) {
   const { domRef, item } = props;
-  const { selected } = useMappedState(({ editorInstance }) => ({
-    selected: editorInstance.selected
+  const { selectedItems } = useMappedState(({ selected }) => ({
+    selectedItems: selected
   }));
   const dispatch = useDispatch();
 
@@ -101,7 +100,7 @@ function useHoverEvent(props: {
           })
         )
         .subscribe(() => {
-          if (!selected.contains(item)) {
+          if (!selectedItems.has(item)) {
             dispatch({ type: "REMOVE_ITEM_BORDER", payload: item });
           }
         });

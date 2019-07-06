@@ -12,6 +12,7 @@ import { BorderArea } from "./BorderArea";
 import { Canvas } from "./Canvas";
 import { Grid } from "./Grid";
 import { NoZoomArea } from "./NoZoomArea";
+import { ResizeHandle } from "./ResizeHandle";
 import { SelectAreaView } from "./SelectArea";
 import { ZoomArea } from "./ZoomArea";
 
@@ -37,6 +38,7 @@ export const Content: React.FC = () => {
       </ZoomArea>
       <NoZoomArea>
         <BorderArea />
+        <ResizeHandle />
       </NoZoomArea>
       <SelectAreaView domRef={editorContainerRef} />
     </div>
