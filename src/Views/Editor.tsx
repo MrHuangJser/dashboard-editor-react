@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Subscription } from "rxjs";
 import { useDragState, useZoomState } from "../components";
 import { Editor } from "../core";
 import {
@@ -70,8 +71,9 @@ export const EditorView = (props: { editor: Editor | null }) => {
 export function useEditorState() {
   const editorContainerRef = useRef<HTMLElement>();
   const dispatch = useDispatch();
-  const { transform } = useMappedState(state => ({
-    transform: state.editorInstance.canvasTransform
+  const { transform, editor } = useMappedState(state => ({
+    transform: state.editorInstance.canvasTransform,
+    editor: state.editorInstance
   }));
 
   const zoomTrans = useZoomState({
@@ -84,6 +86,20 @@ export function useEditorState() {
     domRef: editorContainerRef,
     useSpace: true
   });
+
+  useEffect(() => {
+    let event: Subscription;
+    if (editor) {
+      event = editor.bus.subscribe(res => {
+        dispatch(res);
+      });
+    }
+    return () => {
+      if (event) {
+        event.unsubscribe();
+      }
+    };
+  }, [editor]);
 
   useEffect(() => {
     const { s, ox, oy } = zoomTrans;

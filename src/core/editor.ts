@@ -29,6 +29,6 @@ export class Editor extends EventBus {
   }
 
   public addItem(item: Item) {
-    this.emit("addItem", item);
+    this.emit({ type: "ADD_ITEM", payload: item });
   }
 }

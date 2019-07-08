@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Item } from "../core";
-import { useDispatch, useMappedState } from "../utils";
+import { useMappedState } from "../utils";
 import { ItemView } from "./Item";
 
 export const Canvas = () => {
-  const { size, items, editor } = useCanvasState();
+  const { size, items } = useCanvasState();
 
   return (
     <div
@@ -21,22 +21,13 @@ function ItemsRender(items: Item[]) {
 }
 
 export function useCanvasState() {
-  const dispatch = useDispatch();
   const { editor, size, items: itemList } = useMappedState(
     ({ editorInstance }) => ({
       editor: editorInstance,
       items: editorInstance.items,
-      size: editorInstance.canvasSize,
-    }),
+      size: editorInstance.canvasSize
+    })
   );
-
-  useEffect(() => {
-    if (editor) {
-      editor.on("addItem").subscribe((res) => {
-        dispatch({ type: "ADD_ITEM", payload: res });
-      });
-    }
-  }, [editor]);
 
   return { editor, size, items: itemList };
 }
