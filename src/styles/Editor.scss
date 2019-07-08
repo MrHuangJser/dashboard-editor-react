@@ -10,6 +10,9 @@
     &.on-drag {
       cursor: grabbing;
     }
+    .item-view {
+      pointer-events: none;
+    }
   }
   .no-zoom-area,
   .zoom-area {
@@ -23,6 +26,7 @@
     cursor: default;
   }
   .item-border {
+    pointer-events: none;
     border: 1px solid #298df8;
   }
 }

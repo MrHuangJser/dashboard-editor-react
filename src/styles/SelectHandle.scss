@@ -4,17 +4,6 @@
   * {
     pointer-events: auto;
   }
-  .square {
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    background: white;
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgb(235, 86, 72);
-    border-image: initial;
-    border-radius: 1px;
-  }
   .rect {
     position: absolute;
     border: none;
@@ -35,65 +24,65 @@
       path {
         fill: #298df8;
       }
+      svg {
+        pointer-events: none;
+        * {
+          pointer-events: none;
+        }
+      }
     }
-    .resizable-handler {
+    .block {
+      -webkit-user-drag: none;
+      width: 8px;
+      height: 8px;
+      border: 1px solid #ffaf24;
       position: absolute;
-      width: 14px;
-      height: 14px;
-      cursor: pointer;
-      z-index: 1;
+      background: white;
+      border-radius: 100%;
     }
-    .t,
-    .b {
-      left: 50%;
-      margin-left: -3px;
-      &.resizable-handler {
-        margin-left: -7px;
-      }
-    }
-    .tl,
-    .t,
-    .tr {
+    .n {
       top: -4px;
-      &.resizable-handler {
-        top: -7px;
-      }
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+      cursor: n-resize;
     }
-    .bl,
-    .b,
-    .br {
-      bottom: -6px;
-      &.resizable-handler {
-        bottom: -7px;
-      }
+    .ne {
+      cursor: ne-resize;
+      top: -4px;
+      right: -4px;
     }
-    .l,
-    .r {
+    .e {
+      cursor: e-resize;
       top: 50%;
-      margin-top: -3px;
-      &.resizable-handler {
-        margin-top: -7px;
-      }
+      transform: translate3d(0, -50%, 0);
+      right: -4px;
     }
-    .br,
-    .r,
-    .tr {
-      right: -6px;
-      &.resizable-handler {
-        right: -7px;
-      }
+    .se {
+      cursor: se-resize;
+      bottom: -4px;
+      right: -4px;
     }
-    .tl,
-    .l,
-    .bl {
+    .s {
+      cursor: s-resize;
+      bottom: -4px;
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+    }
+    .sw {
+      cursor: sw-resize;
       left: -4px;
-      &.resizable-handler {
-        left: -7px;
-      }
+      bottom: -4px;
     }
-    .square {
-      border-radius: 50%;
-      border-color: #298df8;
+    .w {
+      cursor: w-resize;
+      left: -4px;
+      top: 50%;
+      transform: translate3d(0, -50%, 0);
+    }
+    .nw {
+      cursor: nw-resize;
+      left: -4px;
+      top: -4px;
     }
   }
 }

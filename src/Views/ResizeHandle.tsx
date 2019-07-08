@@ -1,17 +1,31 @@
-import React from "react";
-import { useResizeHandleState } from "../components";
+import React, { useEffect, useRef, useState } from "react";
+import { useResizeHandle } from "../components";
+import { Group } from "../core";
+import { useDispatch, useMappedState } from "../utils";
+
+let groupStart: Group | null = null;
 
 export const ResizeHandle: React.FC = () => {
-  const { show, width, height, x, y } = useResizeHandleState();
+  const { domRef, group, groupRotateDeg } = useResizeHandleState();
 
   return (
-    <div className="select-handle" style={{ display: show ? "block" : "none" }}>
+    <div
+      className="select-handle"
+      style={{ display: group.show ? "block" : "none" }}
+      ref={ref => {
+        if (ref) {
+          domRef.current = ref;
+        }
+      }}
+    >
       <div
         className="rect"
         style={{
-          width: `${width}px`,
-          height: `${height}px`,
-          transform: `translate3d(${x}px,${y}px,0)`
+          width: `${group.size.width}px`,
+          height: `${group.size.height}px`,
+          transform: `translate3d(${group.transform.x}px,${
+            group.transform.y
+          }px,0) rotate(${groupRotateDeg}deg)`
         }}
       >
         <div className="rotate">
@@ -24,23 +38,59 @@ export const ResizeHandle: React.FC = () => {
             />
           </svg>
         </div>
-        <div className="t resizable-handler" style={{ cursor: "n-resize" }} />
-        <div className="b resizable-handler" style={{ cursor: "s-resize" }} />
-        <div className="r resizable-handler" style={{ cursor: "e-resize" }} />
-        <div className="l resizable-handler" style={{ cursor: "w-resize" }} />
-        <div className="tr resizable-handler" style={{ cursor: "ne-resize" }} />
-        <div className="tl resizable-handler" style={{ cursor: "nw-resize" }} />
-        <div className="br resizable-handler" style={{ cursor: "se-resize" }} />
-        <div className="bl resizable-handler" style={{ cursor: "sw-resize" }} />
-        <div className="t square" />
-        <div className="b square" />
-        <div className="r square" />
-        <div className="l square" />
-        <div className="tr square" />
-        <div className="tl square" />
-        <div className="br square" />
-        <div className="bl square" />
+        <div className="n block" style={{ cursor: "n-resize" }} />
+        <div className="s block" style={{ cursor: "s-resize" }} />
+        <div className="e block" style={{ cursor: "e-resize" }} />
+        <div className="w block" style={{ cursor: "w-resize" }} />
+        <div className="ne block" style={{ cursor: "ne-resize" }} />
+        <div className="nw block" style={{ cursor: "nw-resize" }} />
+        <div className="se block" style={{ cursor: "se-resize" }} />
+        <div className="sw block" style={{ cursor: "sw-resize" }} />
       </div>
     </div>
   );
 };
+
+function useResizeHandleState() {
+  const dispatch = useDispatch();
+  const domRef = useRef<HTMLElement | undefined>();
+  const { scale, items } = useMappedState(({ editorInstance, selected }) => ({
+    scale: editorInstance.canvasTransform.s,
+    items: [...selected]
+  }));
+  const [groupRotateDeg, setGroupRotateDeg] = useState(0);
+
+  const group = new Group(items);
+
+  const { sizeState, rotateDeg, resizeHandleStatus } = useResizeHandle({
+    scale,
+    items,
+    domRef: domRef.current
+  });
+
+  useEffect(() => {
+    if (resizeHandleStatus) {
+      groupStart = new Group(items, true);
+    } else {
+      groupStart = null;
+    }
+  }, [resizeHandleStatus]);
+
+  useEffect(() => {
+    if (groupStart) {
+      setGroupRotateDeg(groupStart!.transform.r + rotateDeg);
+      dispatch({
+        type: "TRANSLATE_ITEM",
+        payload: items.map(item => ({
+          id: item.id,
+          ...item.transform,
+          r:
+            groupStart!.items.find(i => i.id === item.id)!.transform.r +
+            rotateDeg
+        }))
+      });
+    }
+  }, [rotateDeg]);
+
+  return { domRef, group, groupRotateDeg };
+}

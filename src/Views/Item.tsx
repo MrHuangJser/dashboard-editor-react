@@ -9,7 +9,10 @@ import { Widgets } from "../widgets";
 let pointerStart: [number, number] | null = null;
 
 export const ItemView: React.FC<{ item: Item }> = props => {
-  const Widget = Widgets[props.item.type];
+  let Widget;
+  if (props.item.type !== "GROUP") {
+    Widget = Widgets[props.item.type];
+  }
   const { item } = props;
   const { domRef } = useItemState(props);
 
@@ -26,10 +29,10 @@ export const ItemView: React.FC<{ item: Item }> = props => {
         height: `${item.size.height}px`,
         transform: `translate3d(${item.transform.x}px,${
           item.transform.y
-        }px,0) rotate(${item.transform.r})`
+        }px,0) rotate(${item.transform.r}deg)`
       }}
     >
-      <Widget {...item.props} />
+      {Widget ? <Widget {...item.props} /> : ""}
     </div>
   );
 };
@@ -68,6 +71,7 @@ function useDragEvent(props: {
         type: "TRANSLATE_ITEM",
         payload: {
           id: props.item.id,
+          r: props.item.transform.r,
           x: pointerStart[0] + moveState.mx / props.scale,
           y: pointerStart[1] + moveState.my / props.scale
         }

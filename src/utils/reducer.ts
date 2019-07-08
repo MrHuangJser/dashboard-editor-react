@@ -1,4 +1,4 @@
-import { Item } from "../core";
+import { Group, Item } from "../core";
 import { ISize, ITransform } from "../types";
 import { INITIAL_STATE, IState } from "./store";
 
@@ -6,7 +6,12 @@ export type IAction =
   | { type: "SET_CANVAS_TRANSFORM"; payload: ITransform }
   | { type: "SET_CANVAS_SIZE"; payload: ISize }
   | { type: "ADD_ITEM"; payload: Item }
-  | { type: "TRANSLATE_ITEM"; payload: { id: string; x: number; y: number } }
+  | {
+      type: "TRANSLATE_ITEM";
+      payload:
+        | { id: string; x: number; y: number; r: number }
+        | Array<{ id: string; x: number; y: number; r: number }>;
+    }
   | { type: "ROTATE_ITEM"; payload: { id: string; r: number } }
   | { type: "ADD_ITEM_BORDER"; payload: Item }
   | { type: "REMOVE_ITEM_BORDER"; payload: Item }
@@ -33,9 +38,18 @@ export function reducer(
       break;
     case "TRANSLATE_ITEM":
       editorInstance.items = items.map(item => {
-        if (item.id === action.payload.id) {
+        if (!Array.isArray(action.payload) && item.id === action.payload.id) {
+          item.transform.r = action.payload.r;
           item.transform.x = action.payload.x;
           item.transform.y = action.payload.y;
+        }
+        if (Array.isArray(action.payload)) {
+          const itemIndex = action.payload.findIndex(i => item.id === i.id);
+          if (itemIndex !== -1) {
+            item.transform.r = action.payload[itemIndex].r;
+            item.transform.x = action.payload[itemIndex].x;
+            item.transform.y = action.payload[itemIndex].y;
+          }
         }
         return item;
       });
