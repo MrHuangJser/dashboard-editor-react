@@ -1,6 +1,6 @@
 import { createStore, Store } from "redux";
 import { create } from "redux-react-hook";
-import { Editor, Group, Item } from "../core";
+import { Editor, Item } from "../core";
 import { IAction, reducer } from "./reducer";
 
 export interface IState {

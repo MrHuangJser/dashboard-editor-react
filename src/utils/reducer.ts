@@ -1,4 +1,4 @@
-import { Group, Item } from "../core";
+import { Item } from "../core";
 import { ISize, ITransform } from "../types";
 import { INITIAL_STATE, IState } from "./store";
 
@@ -83,8 +83,8 @@ export function reducer(
     case "SELECT_ITEM":
       bordered.clear();
       selected.clear();
-      selected.add(action.payload);
       bordered.add(action.payload);
+      selected.add(action.payload);
       break;
   }
   return { ...state };

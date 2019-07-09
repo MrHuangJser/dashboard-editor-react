@@ -6,7 +6,7 @@ export class Group extends Item {
   public show = false;
   public single = false;
 
-  constructor(items: Item[], deep = false) {
+  constructor(scale = 1, items: Item[], deep = false) {
     super("GROUP");
     this.show = !!items.length;
     this.single = items.length === 1;
@@ -23,14 +23,20 @@ export class Group extends Item {
     if (this.show) {
       this.size = {
         width:
-          maxXItem!.transform.x + maxXItem!.size.width - minXItem!.transform.x,
+          (maxXItem!.transform.x +
+            maxXItem!.size.width -
+            minXItem!.transform.x) *
+          scale,
         height:
-          maxYItem!.transform.y + maxYItem!.size.height - minYItem!.transform.y
+          (maxYItem!.transform.y +
+            maxYItem!.size.height -
+            minYItem!.transform.y) *
+          scale
       };
       this.transform = {
         r: items.length > 1 ? 0 : items[0].transform.r,
-        x: minXItem!.transform.x,
-        y: minYItem!.transform.y
+        x: minXItem!.transform.x * scale,
+        y: minYItem!.transform.y * scale
       };
     }
   }

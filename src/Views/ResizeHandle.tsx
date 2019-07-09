@@ -64,7 +64,7 @@ function useResizeHandleState() {
   }));
   const [groupRotateDeg, setGroupRotateDeg] = useState(0);
 
-  const group = new Group(items);
+  const group = new Group(scale, items);
 
   const { sizeState, rotateDeg, resizeHandleStatus } = useResizeHandle({
     scale,
@@ -74,7 +74,7 @@ function useResizeHandleState() {
 
   useEffect(() => {
     if (resizeHandleStatus) {
-      groupStart = new Group(items, true);
+      groupStart = new Group(scale, items, true);
     } else {
       groupStart = null;
     }
@@ -102,7 +102,11 @@ function useResizeHandleState() {
   useEffect(() => {
     dispatch({
       type: "TRANSLATE_ITEM",
-      payload: sizeMap(sizeState.x, sizeState.y, sizeState.direction)
+      payload: sizeMap(
+        sizeState.x / scale,
+        sizeState.y / scale,
+        sizeState.direction
+      )
     });
   }, [sizeState]);
 
