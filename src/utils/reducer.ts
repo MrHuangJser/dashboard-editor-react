@@ -20,8 +20,10 @@ export type IAction =
   | { type: "ROTATE_ITEM"; payload: { id: string; r: number } }
   | { type: "ADD_ITEM_BORDER"; payload: Item }
   | { type: "REMOVE_ITEM_BORDER"; payload: Item }
-  | { type: "CLEAR_ITEM_BORDER"; payload: undefined }
-  | { type: "SELECT_ITEM"; payload: Item };
+  | { type: "CLEAR_ITEM_BORDER"; payload?: undefined }
+  | { type: "CLEAR_ITEM_SELECT"; payload?: undefined }
+  | { type: "SELECT_ITEM"; payload: Item | Item[] }
+  | { type: "UN_SELECT_ITEM"; payload: Item };
 
 export function reducer(
   state: IState = INITIAL_STATE,
@@ -80,11 +82,24 @@ export function reducer(
     case "CLEAR_ITEM_BORDER":
       bordered.clear();
       break;
-    case "SELECT_ITEM":
+    case "CLEAR_ITEM_SELECT":
       bordered.clear();
       selected.clear();
-      bordered.add(action.payload);
-      selected.add(action.payload);
+      break;
+    case "SELECT_ITEM":
+      if (Array.isArray(action.payload)) {
+        action.payload.forEach(item => {
+          bordered.add(item);
+          selected.add(item);
+        });
+      } else {
+        bordered.add(action.payload);
+        selected.add(action.payload);
+      }
+      break;
+    case "UN_SELECT_ITEM":
+      bordered.delete(action.payload);
+      selected.delete(action.payload);
       break;
   }
   return { ...state };

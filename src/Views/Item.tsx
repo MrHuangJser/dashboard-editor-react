@@ -1,12 +1,17 @@
-import React, { MutableRefObject, useEffect, useRef } from "react";
+import React, {
+  MutableRefObject,
+  useEffect,
+  useLayoutEffect,
+  useRef
+} from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import { useDragState } from "../components";
-import { Item } from "../core";
+import { Group, Item } from "../core";
 import { useDispatch, useMappedState } from "../utils";
 import { Widgets } from "../widgets";
 
-let pointerStart: [number, number] | null = null;
+let groupStart: Group | null = null;
 
 export const ItemView: React.FC<{ item: Item }> = props => {
   let Widget;
@@ -16,8 +21,15 @@ export const ItemView: React.FC<{ item: Item }> = props => {
   const { item } = props;
   const { domRef } = useItemState(props);
 
+  useLayoutEffect(() => {
+    if (domRef.current) {
+      item.itemView = domRef.current;
+    }
+  });
+
   return (
     <div
+      data-id={`item_view_${item.id}`}
       className="item-view"
       ref={ref => {
         if (ref) {
@@ -39,10 +51,11 @@ export const ItemView: React.FC<{ item: Item }> = props => {
 
 function useItemState(props: { item: Item }) {
   const domRef = useRef<HTMLElement | undefined>();
-  const { scale } = useMappedState(({ editorInstance }) => ({
-    scale: editorInstance.canvasTransform.s
+  const { scale, items } = useMappedState(({ editorInstance, selected }) => ({
+    scale: editorInstance.canvasTransform.s,
+    items: [...selected]
   }));
-  useDragEvent({ domRef, item: props.item, scale });
+  useDragEvent({ domRef, item: props.item, items, scale });
   useHoverEvent({ domRef, item: props.item });
 
   return { domRef };
@@ -50,6 +63,7 @@ function useItemState(props: { item: Item }) {
 
 function useDragEvent(props: {
   item: Item;
+  items: Item[];
   domRef: MutableRefObject<HTMLElement | undefined>;
   scale: number;
 }) {
@@ -57,26 +71,29 @@ function useDragEvent(props: {
   const { dragStatus, moveState } = useDragState({ domRef: props.domRef });
 
   useEffect(() => {
-    pointerStart = dragStatus
-      ? [props.item.transform.x, props.item.transform.y]
-      : null;
+    if (!dragStatus) {
+      groupStart = null;
+    }
     if (dragStatus === "on-drag") {
-      dispatch({ type: "SELECT_ITEM", payload: props.item });
+      if (props.items.length < 2) {
+        dispatch({ type: "CLEAR_ITEM_SELECT" });
+        dispatch({ type: "SELECT_ITEM", payload: props.item });
+        groupStart = new Group(props.scale, [props.item], true);
+      } else {
+        groupStart = new Group(props.scale, props.items, true);
+      }
     }
   }, [dragStatus]);
 
   useEffect(() => {
-    if (pointerStart) {
+    if (groupStart) {
       dispatch({
         type: "TRANSLATE_ITEM",
-        payload: [
-          {
-            id: props.item.id,
-            r: props.item.transform.r,
-            x: pointerStart[0] + moveState.mx / props.scale,
-            y: pointerStart[1] + moveState.my / props.scale
-          }
-        ]
+        payload: groupStart.items.map(item => ({
+          id: item.id,
+          x: item.transform.x + moveState.mx / props.scale,
+          y: item.transform.y + moveState.my / props.scale
+        }))
       });
     }
   }, [moveState]);

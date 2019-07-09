@@ -1,13 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useResizeHandle } from "../components";
 import { Group } from "../core";
 import { useDispatch, useMappedState } from "../utils";
 
 let groupStart: Group | null = null;
-
 export const ResizeHandle: React.FC = () => {
-  const { domRef, group, groupRotateDeg } = useResizeHandleState();
-
+  const { domRef, group } = useResizeHandleState();
   return (
     <div
       className="select-handle"
@@ -25,7 +23,7 @@ export const ResizeHandle: React.FC = () => {
           height: `${group.size.height}px`,
           transform: `translate3d(${group.transform.x}px,${
             group.transform.y
-          }px,0) rotate(${groupRotateDeg}deg)`
+          }px,0) rotate(${group.transform.r}deg)`
         }}
       >
         {group.single ? (
@@ -62,15 +60,14 @@ function useResizeHandleState() {
     scale: editorInstance.canvasTransform.s,
     items: [...selected]
   }));
-  const [groupRotateDeg, setGroupRotateDeg] = useState(0);
-
-  const group = new Group(scale, items);
 
   const { sizeState, rotateDeg, resizeHandleStatus } = useResizeHandle({
-    scale,
-    items,
     domRef: domRef.current
   });
+
+  useLayoutEffect(() => {
+    dispatch({ type: "SELECT_ITEM", payload: items });
+  }, [scale]);
 
   useEffect(() => {
     if (resizeHandleStatus) {
@@ -82,7 +79,6 @@ function useResizeHandleState() {
 
   useEffect(() => {
     if (groupStart) {
-      setGroupRotateDeg(getRotateDeg(groupStart!.transform.r, rotateDeg));
       dispatch({
         type: "TRANSLATE_ITEM",
         payload: items.map(item => {
@@ -110,7 +106,7 @@ function useResizeHandleState() {
     });
   }, [sizeState]);
 
-  return { domRef, group, groupRotateDeg };
+  return { domRef, group: new Group(scale, items) };
 }
 
 function getRotateDeg(original: number, rotated: number) {

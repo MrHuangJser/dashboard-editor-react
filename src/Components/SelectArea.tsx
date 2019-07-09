@@ -19,7 +19,7 @@ const upEvent = fromEvent<PointerEvent>(window, "pointerup");
 
 let pointerStart: [number, number] | null = null;
 
-export const useSelectAreaState = (props: ISelectAreaProps) => {
+export const useSelectArea = (props: ISelectAreaProps) => {
   const [status, setStatus] = useState<SelectStatusType>(null);
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);

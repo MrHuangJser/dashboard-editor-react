@@ -6,8 +6,9 @@
   }
   .rect {
     position: absolute;
-    border: none;
+    border: 1px solid #298df8;
     pointer-events: none;
+    box-sizing: border-box;
     .rotate {
       position: absolute;
       left: 50%;

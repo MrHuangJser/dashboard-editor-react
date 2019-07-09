@@ -10,6 +10,7 @@ export class Item {
   public transform = { r: 0, x: 0, y: 0 };
   public size: ISize = { width: 100, height: 50 };
   public status: "dragging" | "resizing" | null = null;
+  public itemView: HTMLElement | undefined;
 
   constructor(type: k | "GROUP", props?: IWidgetTypes[k]) {
     this.type = type;

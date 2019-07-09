@@ -20,7 +20,7 @@ import { ZoomArea } from "./ZoomArea";
 let pointerStart: [number, number] | null = null;
 
 export const Content: React.FC = () => {
-  const { editorContainerRef } = useEditorState();
+  const { editorContainerRef, clearState } = useEditorState();
 
   return (
     <div
@@ -30,6 +30,7 @@ export const Content: React.FC = () => {
           editorContainerRef.current = ref;
         }
       }}
+      onPointerDown={() => clearState()}
     >
       <NoZoomArea>
         <Grid />
@@ -130,5 +131,8 @@ export function useEditorState() {
     }
   }, [moveState]);
 
-  return { editorContainerRef };
+  return {
+    editorContainerRef,
+    clearState: () => dispatch({ type: "CLEAR_ITEM_SELECT" })
+  };
 }

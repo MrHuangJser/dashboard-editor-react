@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { map, switchMap, takeUntil } from "rxjs/operators";
-import { Item } from "../core";
-import { useDispatch } from "../utils";
 
 let center: [number, number] | null = null;
 let start: [number, number] | null = null;
@@ -11,13 +9,8 @@ let direction: string = "";
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
 const upEvent = fromEvent<PointerEvent>(window, "pointerup");
 
-export function useResizeHandle(props: {
-  domRef: HTMLElement | undefined;
-  items: Item[];
-  scale: number;
-}) {
-  const dispatch = useDispatch();
-  const { domRef, scale, items } = props;
+export function useResizeHandle(props: { domRef: HTMLElement | undefined }) {
+  const { domRef } = props;
   const [rotateDeg, setDeg] = useState(0);
   const [sizeState, setResizeState] = useState({ x: 0, y: 0, direction: "" });
   const [resizeHandleStatus, setStatus] = useState(false);
@@ -114,22 +107,4 @@ function getRotate(end: [number, number]) {
     (Math.acos((b2 + c2 - a2) / (2 * Math.sqrt(b2) * Math.sqrt(c2))) * 180) /
     Math.PI
   );
-}
-
-function getRotateDirection(
-  centerPoint: [number, number],
-  startPoint: [number, number],
-  endPoint: [number, number]
-) {
-  console.log(
-    "start quadrant",
-    startPoint[0] - centerPoint[0],
-    startPoint[1] - centerPoint[1]
-  );
-  console.log(
-    "end quadrant",
-    endPoint[0] - centerPoint[0],
-    endPoint[1] - centerPoint[1]
-  );
-  return true;
 }

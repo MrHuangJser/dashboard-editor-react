@@ -12,32 +12,47 @@ export class Group extends Item {
     this.single = items.length === 1;
     this.items = deep ? items.map(item => _.cloneDeep(item)) : items;
 
-    const minXItem = _.minBy(items, item => item.transform.x);
-    const minYItem = _.minBy(items, item => item.transform.y);
-    const maxXItem = _.maxBy(items, item => item.transform.x + item.size.width);
-    const maxYItem = _.maxBy(
-      items,
-      item => item.transform.y + item.size.height
-    );
-
     if (this.show) {
-      this.size = {
-        width:
-          (maxXItem!.transform.x +
-            maxXItem!.size.width -
-            minXItem!.transform.x) *
-          scale,
-        height:
-          (maxYItem!.transform.y +
-            maxYItem!.size.height -
-            minYItem!.transform.y) *
-          scale
-      };
-      this.transform = {
-        r: items.length > 1 ? 0 : items[0].transform.r,
-        x: minXItem!.transform.x * scale,
-        y: minYItem!.transform.y * scale
-      };
+      if (this.single) {
+        this.size = {
+          width: this.items[0].size.width * scale,
+          height: this.items[0].size.height * scale
+        };
+        this.transform = {
+          r: this.items[0].transform.r,
+          x: this.items[0].transform.x * scale,
+          y: this.items[0].transform.y * scale
+        };
+      } else {
+        const minXItem = _.minBy(
+          items,
+          item => item.itemView!.getBoundingClientRect().left
+        )!.itemView!.getBoundingClientRect();
+        const minYItem = _.minBy(
+          items,
+          item => item.itemView!.getBoundingClientRect().top
+        )!.itemView!.getBoundingClientRect();
+        const maxXItem = _.maxBy(items, item => {
+          const rect = item.itemView!.getBoundingClientRect();
+          return rect.left + rect.width;
+        })!.itemView!.getBoundingClientRect();
+        const maxYItem = _.maxBy(items, item => {
+          const rect = item.itemView!.getBoundingClientRect();
+          return rect.top + rect.height;
+        })!.itemView!.getBoundingClientRect();
+        this.size = {
+          width: maxXItem.left + maxXItem.width - minXItem.left,
+          height: maxYItem.top + maxYItem.height - minYItem.top
+        };
+        const areaRect = document
+          .querySelector(".no-zoom-area")!
+          .getBoundingClientRect();
+        this.transform = {
+          r: 0,
+          x: minXItem.left - areaRect.left,
+          y: minYItem.top - areaRect.top
+        };
+      }
     }
   }
 }

@@ -4,10 +4,10 @@ import { useMappedState } from "../utils";
 export const ZoomArea: React.FC = ({ children }) => {
   const {
     size,
-    transform: { s, x, y },
+    transform: { s, x, y }
   } = useMappedState(({ editorInstance: { canvasSize, canvasTransform } }) => ({
     size: canvasSize,
-    transform: canvasTransform,
+    transform: canvasTransform
   }));
 
   return (
@@ -18,7 +18,7 @@ export const ZoomArea: React.FC = ({ children }) => {
         transformOrigin: "0 0",
         width: `${size.width}px`,
         height: `${size.height}px`,
-        transform: `matrix(${s},0,0,${s},${x},${y})`,
+        transform: `translate3d(${x}px,${y}px,0) scale(${s})`
       }}
     >
       {children}

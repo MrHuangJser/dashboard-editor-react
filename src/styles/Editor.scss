@@ -28,5 +28,6 @@
   .item-border {
     pointer-events: none;
     border: 1px solid #298df8;
+    box-sizing: border-box;
   }
 }
