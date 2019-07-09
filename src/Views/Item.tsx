@@ -69,12 +69,14 @@ function useDragEvent(props: {
     if (pointerStart) {
       dispatch({
         type: "TRANSLATE_ITEM",
-        payload: {
-          id: props.item.id,
-          r: props.item.transform.r,
-          x: pointerStart[0] + moveState.mx / props.scale,
-          y: pointerStart[1] + moveState.my / props.scale
-        }
+        payload: [
+          {
+            id: props.item.id,
+            r: props.item.transform.r,
+            x: pointerStart[0] + moveState.mx / props.scale,
+            y: pointerStart[1] + moveState.my / props.scale
+          }
+        ]
       });
     }
   }, [moveState]);

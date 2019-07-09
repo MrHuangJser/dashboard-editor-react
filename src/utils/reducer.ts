@@ -8,9 +8,14 @@ export type IAction =
   | { type: "ADD_ITEM"; payload: Item }
   | {
       type: "TRANSLATE_ITEM";
-      payload:
-        | { id: string; x: number; y: number; r: number }
-        | Array<{ id: string; x: number; y: number; r: number }>;
+      payload: Array<{
+        id: string;
+        x?: number;
+        y?: number;
+        r?: number;
+        width?: number;
+        height?: number;
+      }>;
     }
   | { type: "ROTATE_ITEM"; payload: { id: string; r: number } }
   | { type: "ADD_ITEM_BORDER"; payload: Item }
@@ -38,17 +43,29 @@ export function reducer(
       break;
     case "TRANSLATE_ITEM":
       editorInstance.items = items.map(item => {
-        if (!Array.isArray(action.payload) && item.id === action.payload.id) {
-          item.transform.r = action.payload.r;
-          item.transform.x = action.payload.x;
-          item.transform.y = action.payload.y;
-        }
         if (Array.isArray(action.payload)) {
           const itemIndex = action.payload.findIndex(i => item.id === i.id);
           if (itemIndex !== -1) {
-            item.transform.r = action.payload[itemIndex].r;
-            item.transform.x = action.payload[itemIndex].x;
-            item.transform.y = action.payload[itemIndex].y;
+            item.transform.r =
+              action.payload[itemIndex].r !== undefined
+                ? action.payload[itemIndex].r!
+                : item.transform.r;
+            item.transform.x =
+              action.payload[itemIndex].x !== undefined
+                ? action.payload[itemIndex].x!
+                : item.transform.x;
+            item.transform.y =
+              action.payload[itemIndex].y !== undefined
+                ? action.payload[itemIndex].y!
+                : item.transform.y;
+            item.size.width =
+              action.payload[itemIndex].width !== undefined
+                ? action.payload[itemIndex].width!
+                : item.size.width;
+            item.size.height =
+              action.payload[itemIndex].height !== undefined
+                ? action.payload[itemIndex].height!
+                : item.size.height;
           }
         }
         return item;

@@ -4,10 +4,12 @@ import { Item } from "./item";
 export class Group extends Item {
   public items: Item[];
   public show = false;
+  public single = false;
 
   constructor(items: Item[], deep = false) {
     super("GROUP");
     this.show = !!items.length;
+    this.single = items.length === 1;
     this.items = deep ? items.map(item => _.cloneDeep(item)) : items;
 
     const minXItem = _.minBy(items, item => item.transform.x);

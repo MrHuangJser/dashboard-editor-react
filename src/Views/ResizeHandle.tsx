@@ -28,16 +28,20 @@ export const ResizeHandle: React.FC = () => {
           }px,0) rotate(${groupRotateDeg}deg)`
         }}
       >
-        <div className="rotate">
-          <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
-            <path
-              // tslint:disable-next-line:max-line-length
-              d="M10.536 3.464A5 5 0 1 0 11 10l1.424 1.425a7 7 0 1 1-.475-9.374L13.659.34A.2.2 0 0 1 14 .483V5.5a.5.5 0 0 1-.5.5H8.483a.2.2 0 0 1-.142-.341l2.195-2.195z"
-              fill="#eb5648"
-              fillRule="nonzero"
-            />
-          </svg>
-        </div>
+        {group.single ? (
+          <div className="rotate">
+            <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+              <path
+                // tslint:disable-next-line:max-line-length
+                d="M10.536 3.464A5 5 0 1 0 11 10l1.424 1.425a7 7 0 1 1-.475-9.374L13.659.34A.2.2 0 0 1 14 .483V5.5a.5.5 0 0 1-.5.5H8.483a.2.2 0 0 1-.142-.341l2.195-2.195z"
+                fill="#eb5648"
+                fillRule="nonzero"
+              />
+            </svg>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="n block" style={{ cursor: "n-resize" }} />
         <div className="s block" style={{ cursor: "s-resize" }} />
         <div className="e block" style={{ cursor: "e-resize" }} />
@@ -78,19 +82,97 @@ function useResizeHandleState() {
 
   useEffect(() => {
     if (groupStart) {
-      setGroupRotateDeg(groupStart!.transform.r + rotateDeg);
+      setGroupRotateDeg(getRotateDeg(groupStart!.transform.r, rotateDeg));
       dispatch({
         type: "TRANSLATE_ITEM",
-        payload: items.map(item => ({
-          id: item.id,
-          ...item.transform,
-          r:
-            groupStart!.items.find(i => i.id === item.id)!.transform.r +
-            rotateDeg
-        }))
+        payload: items.map(item => {
+          return {
+            id: item.id,
+            ...item.transform,
+            r: getRotateDeg(
+              groupStart!.items.find(i => i.id === item.id)!.transform.r,
+              rotateDeg
+            )
+          };
+        })
       });
     }
   }, [rotateDeg]);
 
+  useEffect(() => {
+    dispatch({
+      type: "TRANSLATE_ITEM",
+      payload: sizeMap(sizeState.x, sizeState.y, sizeState.direction)
+    });
+  }, [sizeState]);
+
   return { domRef, group, groupRotateDeg };
+}
+
+function getRotateDeg(original: number, rotated: number) {
+  let mergedRotateDeg = original + Math.round(rotated);
+  mergedRotateDeg =
+    mergedRotateDeg < 0 ? 360 + mergedRotateDeg : mergedRotateDeg;
+  return 357 < mergedRotateDeg || mergedRotateDeg < 3 ? 0 : mergedRotateDeg;
+}
+
+function sizeMap(mx: number, my: number, direction: string) {
+  let items: any[] = [];
+  if (groupStart) {
+    items = groupStart.items.map(item => {
+      switch (direction) {
+        case "n":
+          return {
+            id: item.id,
+            y: item.transform.y + my,
+            height: item.size.height - my
+          };
+        case "s":
+          return {
+            id: item.id,
+            height: item.size.height + my
+          };
+        case "e":
+          return {
+            id: item.id,
+            width: item.size.width + mx
+          };
+        case "w":
+          return {
+            id: item.id,
+            x: item.transform.x + mx,
+            width: item.size.width - mx
+          };
+        case "ne":
+          return {
+            id: item.id,
+            y: item.transform.y + my,
+            height: item.size.height - my,
+            width: item.size.width + mx
+          };
+        case "nw":
+          return {
+            id: item.id,
+            y: item.transform.y + my,
+            x: item.transform.x + mx,
+            width: item.size.width - mx,
+            height: item.size.height - my
+          };
+        case "se":
+          return {
+            id: item.id,
+            width: item.size.width + mx,
+            height: item.size.height + my
+          };
+        case "sw":
+          return {
+            id: item.id,
+            x: item.transform.x + mx,
+            width: item.size.width - mx,
+            height: item.size.height + my
+          };
+      }
+    });
+  }
+  return items;
 }

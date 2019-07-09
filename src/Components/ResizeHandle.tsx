@@ -6,6 +6,8 @@ import { useDispatch } from "../utils";
 
 let center: [number, number] | null = null;
 let start: [number, number] | null = null;
+let oldRotateDeg = 0;
+let direction: string = "";
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
 const upEvent = fromEvent<PointerEvent>(window, "pointerup");
 
@@ -55,6 +57,7 @@ export function useResizeHandle(props: {
     e.stopPropagation();
     setStatus(true);
     start = [e.clientX, e.clientY];
+    direction = (e.target as HTMLElement).classList[0];
     const eleRect = (domRef!.querySelector(
       ".rect"
     ) as HTMLElement).getBoundingClientRect();
@@ -69,18 +72,27 @@ export function useResizeHandle(props: {
 
   function move(e: PointerEvent, type: "rotate" | "resize" | undefined) {
     if (start && center) {
-      const mx = e.pageX - start[0];
-      const my = e.pageY - start[1];
+      const mx = e.clientX - start[0];
+      const my = e.clientY - start[1];
       switch (type) {
         case "resize":
+          setResizeState({
+            x: mx,
+            y: my,
+            direction
+          });
           break;
         case "rotate":
           const r = getRotate([e.clientX, e.clientY]);
-          if (mx > 0) {
-            setDeg(r);
-          } else if (mx < 0) {
-            setDeg(360 - r);
+          const d =
+            (start[0] - center[0]) * (e.clientY - center[1]) -
+            (start[1] - center[1]) * (e.clientX - center[0]);
+          if (d > 0) {
+            setDeg(r < oldRotateDeg ? r - 360 : r);
+          } else {
+            setDeg(r < oldRotateDeg ? 360 - r : -r);
           }
+          oldRotateDeg = r;
           break;
       }
     }
@@ -102,4 +114,22 @@ function getRotate(end: [number, number]) {
     (Math.acos((b2 + c2 - a2) / (2 * Math.sqrt(b2) * Math.sqrt(c2))) * 180) /
     Math.PI
   );
+}
+
+function getRotateDirection(
+  centerPoint: [number, number],
+  startPoint: [number, number],
+  endPoint: [number, number]
+) {
+  console.log(
+    "start quadrant",
+    startPoint[0] - centerPoint[0],
+    startPoint[1] - centerPoint[1]
+  );
+  console.log(
+    "end quadrant",
+    endPoint[0] - centerPoint[0],
+    endPoint[1] - centerPoint[1]
+  );
+  return true;
 }
