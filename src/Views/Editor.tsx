@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Subscription } from "rxjs";
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import { fromEvent, Subscription } from "rxjs";
 import { useDragState, useZoomState } from "../components";
 import { Editor } from "../core";
+import { IContextMenuProps } from "../types/ContextMenu";
 import {
+  ContextMenuContext,
   INITIAL_STATE,
   makeStore,
   StoreContext,
@@ -11,6 +13,7 @@ import {
 } from "../utils";
 import { BorderArea } from "./BorderArea";
 import { Canvas } from "./Canvas";
+import { ContextMenu } from "./ContextMenu";
 import { Grid } from "./Grid";
 import { NoZoomArea } from "./NoZoomArea";
 import { ResizeHandle } from "./ResizeHandle";
@@ -21,29 +24,52 @@ let pointerStart: [number, number] | null = null;
 
 export const Content: React.FC = () => {
   const { editorContainerRef, clearState } = useEditorState();
+  const [contextMenuProps, setContextMenuProps] = useState<IContextMenuProps>();
+
+  useEffect(() => {
+    let event: Subscription;
+    if (editorContainerRef.current) {
+      event = fromEvent<MouseEvent>(
+        editorContainerRef.current,
+        "mousedown"
+      ).subscribe(() => {
+        clearState();
+        setContextMenuProps(undefined);
+      });
+    }
+    return () => {
+      if (event) {
+        event.unsubscribe();
+      }
+    };
+  });
 
   return (
-    <div
-      className="editor-container"
-      ref={ref => {
-        if (ref) {
-          editorContainerRef.current = ref;
-        }
-      }}
-      onPointerDown={() => clearState()}
-    >
-      <NoZoomArea>
-        <Grid />
-      </NoZoomArea>
-      <ZoomArea>
-        <Canvas />
-      </ZoomArea>
-      <NoZoomArea>
-        <BorderArea />
-        <ResizeHandle />
-      </NoZoomArea>
-      <SelectAreaView domRef={editorContainerRef} />
-    </div>
+    <Fragment>
+      <div
+        className="editor-container"
+        ref={ref => {
+          if (ref) {
+            editorContainerRef.current = ref;
+          }
+        }}
+      >
+        <ContextMenuContext.Provider value={{ setContextMenuProps }}>
+          <NoZoomArea>
+            <Grid />
+          </NoZoomArea>
+          <ZoomArea>
+            <Canvas />
+          </ZoomArea>
+          <NoZoomArea>
+            <BorderArea />
+            <ResizeHandle />
+          </NoZoomArea>
+          <SelectAreaView domRef={editorContainerRef} />
+        </ContextMenuContext.Provider>
+      </div>
+      {contextMenuProps ? <ContextMenu {...contextMenuProps} /> : ""}
+    </Fragment>
   );
 };
 
@@ -87,6 +113,21 @@ export function useEditorState() {
     domRef: editorContainerRef,
     useSpace: true
   });
+
+  useEffect(() => {
+    let event: Subscription;
+    if (editorContainerRef.current) {
+      event = fromEvent<MouseEvent>(document, "contextmenu").subscribe(e => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
+    return () => {
+      if (event) {
+        event.unsubscribe();
+      }
+    };
+  }, [editorContainerRef.current]);
 
   useEffect(() => {
     let event: Subscription;

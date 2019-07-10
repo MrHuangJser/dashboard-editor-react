@@ -18,12 +18,15 @@ export type IAction =
       }>;
     }
   | { type: "ROTATE_ITEM"; payload: { id: string; r: number } }
-  | { type: "ADD_ITEM_BORDER"; payload: Item }
-  | { type: "REMOVE_ITEM_BORDER"; payload: Item }
+  | { type: "ADD_ITEM_BORDER"; payload: Item[] }
+  | { type: "REMOVE_ITEM_BORDER"; payload: Item[] }
   | { type: "CLEAR_ITEM_BORDER"; payload?: undefined }
   | { type: "CLEAR_ITEM_SELECT"; payload?: undefined }
   | { type: "SELECT_ITEM"; payload: Item | Item[] }
-  | { type: "UN_SELECT_ITEM"; payload: Item };
+  | { type: "UN_SELECT_ITEM"; payload: Item }
+  | { type: "DELETE_ITEM"; payload: Item[] }
+  | { type: "GROUP_ITEM"; payload: Item[] }
+  | { type: "UN_GROUP_ITEM"; payload: string };
 
 export function reducer(
   state: IState = INITIAL_STATE,
@@ -74,10 +77,14 @@ export function reducer(
       });
       break;
     case "ADD_ITEM_BORDER":
-      bordered.add(action.payload);
+      action.payload.forEach(item => {
+        bordered.add(item);
+      });
       break;
     case "REMOVE_ITEM_BORDER":
-      bordered.delete(action.payload);
+      action.payload.forEach(item => {
+        bordered.delete(item);
+      });
       break;
     case "CLEAR_ITEM_BORDER":
       bordered.clear();
@@ -100,6 +107,34 @@ export function reducer(
     case "UN_SELECT_ITEM":
       bordered.delete(action.payload);
       selected.delete(action.payload);
+      break;
+    case "DELETE_ITEM":
+      action.payload.forEach(item => {
+        bordered.delete(item);
+        selected.delete(item);
+        editorInstance.items = editorInstance.items.filter(
+          i => i.id !== item.id
+        );
+      });
+      break;
+    case "GROUP_ITEM":
+      const groupId = `group_${Date.now()}_${Math.round(
+        Math.random() * 100000
+      )}`;
+      editorInstance.items = editorInstance.items.map(item => {
+        if (action.payload.findIndex(i => item.id === i.id) !== -1) {
+          item.groupId = groupId;
+        }
+        return item;
+      });
+      break;
+    case "UN_GROUP_ITEM":
+      editorInstance.items = editorInstance.items.map(item => {
+        if (item.groupId === action.payload) {
+          item.groupId = undefined;
+        }
+        return item;
+      });
       break;
   }
   return { ...state };

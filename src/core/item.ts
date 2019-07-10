@@ -11,6 +11,7 @@ export class Item {
   public size: ISize = { width: 100, height: 50 };
   public status: "dragging" | "resizing" | null = null;
   public itemView: HTMLElement | undefined;
+  public groupId?: string;
 
   constructor(type: k | "GROUP", props?: IWidgetTypes[k]) {
     this.type = type;
