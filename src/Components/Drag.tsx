@@ -63,6 +63,7 @@ export const useDragState = (props: IDragWrapProps) => {
     if (props.domRef && props.domRef.current) {
       refEvent = fromEvent<PointerEvent>(props.domRef.current, "pointerdown")
         .pipe(
+          filter(e => e.button === 0),
           filter(() => (props.useSpace ? spaceKey.current : !spaceKey.current)),
           switchMap(e => {
             down(e);

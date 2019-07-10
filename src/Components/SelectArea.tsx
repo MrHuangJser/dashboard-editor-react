@@ -2,7 +2,7 @@ import {
   MutableRefObject,
   PropsWithChildren,
   useEffect,
-  useState,
+  useState
 } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { filter, map, switchMap, takeUntil } from "rxjs/operators";
@@ -35,23 +35,24 @@ export const useSelectArea = (props: ISelectAreaProps) => {
     if (props.domRef && props.domRef.current) {
       subscription = fromEvent<PointerEvent>(
         props.domRef.current,
-        "pointerdown",
+        "pointerdown"
       )
         .pipe(
+          filter(e => e.button === 0),
           filter(
             () =>
               !!(
                 props.domRef &&
                 props.domRef.current &&
                 !props.domRef.current.classList.contains("in-drag")
-              ),
+              )
           ),
-          switchMap((e) => {
+          switchMap(e => {
             down(e);
-            return moveEvent.pipe(takeUntil(upEvent.pipe(map((ev) => up(ev)))));
-          }),
+            return moveEvent.pipe(takeUntil(upEvent.pipe(map(ev => up(ev)))));
+          })
         )
-        .subscribe((e) => move(e));
+        .subscribe(e => move(e));
     }
     return () => {
       if (subscription) {
