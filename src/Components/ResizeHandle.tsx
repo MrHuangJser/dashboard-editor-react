@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
-import { map, switchMap, takeUntil } from "rxjs/operators";
+import { filter, map, switchMap, takeUntil } from "rxjs/operators";
 
 let center: [number, number] | null = null;
 let start: [number, number] | null = null;
 let oldRotateDeg = 0;
 let direction: string = "";
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
-const upEvent = fromEvent<PointerEvent>(window, "pointerup");
+const upEvent = fromEvent<PointerEvent>(window, "pointerup").pipe(
+  filter(e => e.button === 0)
+);
 
 export function useResizeHandle(props: { domRef: HTMLElement | undefined }) {
   const { domRef } = props;
@@ -28,6 +30,7 @@ export function useResizeHandle(props: { domRef: HTMLElement | undefined }) {
     if (domRef) {
       event = fromEvent<PointerEvent>(domRef, "pointerdown")
         .pipe(
+          filter(e => e.button === 0),
           map(e => down(e)),
           switchMap(type => {
             return moveEvent.pipe(

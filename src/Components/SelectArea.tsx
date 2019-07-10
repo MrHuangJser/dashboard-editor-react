@@ -15,8 +15,9 @@ export interface ISelectAreaProps
 type SelectStatusType = "start" | "moving" | "end" | null;
 
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
-const upEvent = fromEvent<PointerEvent>(window, "pointerup");
-
+const upEvent = fromEvent<PointerEvent>(window, "pointerup").pipe(
+  filter(e => e.button === 0)
+);
 let pointerStart: [number, number] | null = null;
 
 export const useSelectArea = (props: ISelectAreaProps) => {

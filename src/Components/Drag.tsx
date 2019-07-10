@@ -8,7 +8,9 @@ export interface IDragWrapProps {
 }
 
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
-const upEvent = fromEvent<PointerEvent>(window, "pointerup");
+const upEvent = fromEvent<PointerEvent>(window, "pointerup").pipe(
+  filter(e => e.button === 0)
+);
 const keyDownEvent = fromEvent<KeyboardEvent>(window, "keydown");
 const keyUpEvent = fromEvent<KeyboardEvent>(window, "keyup");
 
