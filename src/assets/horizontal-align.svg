@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" aria-hidden="true">
+  <rect x="7" width="1" height="14" class="main"></rect>
+  <rect x="1" y="2" width="13" height="4" rx="1" class="secondary"></rect>
+  <rect x="4" y="8" width="7" height="4" rx="1" class="tertiary"></rect>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" aria-hidden="true">
+  <rect x="3" y="2" width="10" height="4" rx="1" class="secondary"></rect>
+  <rect x="3" y="8" width="5" height="4" rx="1" class="tertiary"></rect>
+  <path d="M1 1h1v12H1z" class="main"></path>
+</svg>
