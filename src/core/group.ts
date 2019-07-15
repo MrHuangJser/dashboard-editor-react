@@ -5,6 +5,10 @@ export class Group extends Item {
   public items: Item[];
   public show = false;
   public single = false;
+  public minXItem: ClientRect | DOMRect | undefined;
+  public minYItem: ClientRect | DOMRect | undefined;
+  public maxXItem: ClientRect | DOMRect | undefined;
+  public maxYItem: ClientRect | DOMRect | undefined;
 
   constructor(scale = 1, items: Item[], deep = false) {
     super("GROUP");
@@ -24,33 +28,33 @@ export class Group extends Item {
           y: this.items[0].transform.y * scale
         };
       } else {
-        const minXItem = _.minBy(
+        this.minXItem = _.minBy(
           items,
           item => item.itemView!.getBoundingClientRect().left
         )!.itemView!.getBoundingClientRect();
-        const minYItem = _.minBy(
+        this.minYItem = _.minBy(
           items,
           item => item.itemView!.getBoundingClientRect().top
         )!.itemView!.getBoundingClientRect();
-        const maxXItem = _.maxBy(items, item => {
+        this.maxXItem = _.maxBy(items, item => {
           const rect = item.itemView!.getBoundingClientRect();
           return rect.left + rect.width;
         })!.itemView!.getBoundingClientRect();
-        const maxYItem = _.maxBy(items, item => {
+        this.maxYItem = _.maxBy(items, item => {
           const rect = item.itemView!.getBoundingClientRect();
           return rect.top + rect.height;
         })!.itemView!.getBoundingClientRect();
         this.size = {
-          width: maxXItem.left + maxXItem.width - minXItem.left,
-          height: maxYItem.top + maxYItem.height - minYItem.top
+          width: this.maxXItem.left + this.maxXItem.width - this.minXItem.left,
+          height: this.maxYItem.top + this.maxYItem.height - this.minYItem.top
         };
         const areaRect = document
           .querySelector(".no-zoom-area")!
           .getBoundingClientRect();
         this.transform = {
           r: 0,
-          x: minXItem.left - areaRect.left,
-          y: minYItem.top - areaRect.top
+          x: this.minXItem.left - areaRect.left,
+          y: this.minYItem.top - areaRect.top
         };
       }
     }

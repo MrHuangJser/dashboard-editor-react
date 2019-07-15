@@ -81,8 +81,15 @@ export function reducer(
       }
       break;
     case "UN_SELECT_ITEM":
-      bordered.delete(action.payload);
-      selected.delete(action.payload);
+      if (Array.isArray(action.payload)) {
+        action.payload.forEach(item => {
+          bordered.delete(item);
+          selected.delete(item);
+        });
+      } else {
+        bordered.delete(action.payload);
+        selected.delete(action.payload);
+      }
       break;
     case "DELETE_ITEM":
       action.payload.forEach((item: Item) => {
@@ -113,6 +120,6 @@ export function reducer(
       });
       break;
   }
-  editorInstance.selected = [...selected];
+  editorInstance.selected = selected;
   return { ...state };
 }

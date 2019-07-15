@@ -27,7 +27,7 @@ export interface IEventTypes {
   CLEAR_ITEM_BORDER: any | undefined;
   CLEAR_ITEM_SELECT: any | undefined;
   SELECT_ITEM: Item | Item[];
-  UN_SELECT_ITEM: Item[];
+  UN_SELECT_ITEM: Item | Item[];
   DELETE_ITEM: Item[];
   GROUP_ITEM: string;
   UN_GROUP_ITEM: string;
