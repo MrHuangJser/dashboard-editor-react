@@ -65,7 +65,9 @@ $hovered-color: rgb(65, 80, 88);
         cursor: pointer;
         color: $normal-color;
         &:hover {
-          color: $hovered-color;
+          &:not(.disabled) {
+            color: $hovered-color;
+          }
         }
         &.disabled {
           cursor: not-allowed;

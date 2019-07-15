@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import { EditorContext } from "../App";
 import BottomAlign from "../assets/bottom-align.svg";
 import Break from "../assets/break.svg";
@@ -13,8 +13,12 @@ import Subtract from "../assets/subtract.svg";
 import TopAlign from "../assets/top-align.svg";
 import VerticalAlign from "../assets/vertical-align.svg";
 import VerticalBetween from "../assets/vertical-between.svg";
+import { Item } from "../editor";
 
 export const Toolbar: FC = () => {
+  const { items, scale, setScale } = useToolbarState();
+  const className = `toolbar-item ${!!items.length ? "" : "disabled"}`;
+
   return (
     <div className="toolbar">
       <div className="title">
@@ -25,54 +29,54 @@ export const Toolbar: FC = () => {
       </div>
       <div className="toolbar-center">
         <div>
-          <a className="toolbar-item" title="左对齐">
+          <a className={className} title="左对齐">
             <div className="icon">
               <LeftAlign className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="右对齐">
+          <a className={className} title="右对齐">
             <div className="icon">
               <RightAlign className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="上对齐">
+          <a className={className} title="上对齐">
             <div className="icon">
               <TopAlign className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="下对齐">
+          <a className={className} title="下对齐">
             <div className="icon">
               <BottomAlign className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="垂直对齐">
+          <a className={className} title="垂直对齐">
             <div className="icon">
               <VerticalAlign className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="水平对齐">
+          <a className={className} title="水平对齐">
             <div className="icon">
               <HorizontalAlign className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="水平分布">
+          <a className={className} title="水平分布">
             <div className="icon">
               <HorizontalBetween className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="垂直分布">
+          <a className={className} title="垂直分布">
             <div className="icon">
               <VerticalBetween className="svg-icon" />
             </div>
           </a>
         </div>
         <div>
-          <a className="toolbar-item" title="组合">
+          <a className={className} title="组合">
             <div className="icon">
               <Group className="svg-icon" />
             </div>
           </a>
-          <a className="toolbar-item" title="打散">
+          <a className={className} title="打散">
             <div className="icon">
               <Break className="svg-icon" />
             </div>
@@ -81,7 +85,9 @@ export const Toolbar: FC = () => {
         <div>
           <div className="zoom-button-group">
             <Subtract className="svg-icon" />
-            <a>100%</a>
+            <a onDoubleClick={() => setScale(100)}>
+              {Math.round(scale.current)}%
+            </a>
             <Plus className="svg-icon" />
           </div>
         </div>
@@ -93,13 +99,35 @@ export const Toolbar: FC = () => {
 
 export function useToolbarState() {
   const editor = useContext(EditorContext);
-  const [] = useState();
+  const scale = useRef<number>(100);
+  const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
     if (editor) {
-      editor.on("SELECT_ITEM").subscribe();
+      editor
+        .on([
+          "SELECT_ITEM",
+          "CLEAR_ITEM_SELECT",
+          "UN_SELECT_ITEM",
+          "DELETE_ITEM",
+          "SET_CANVAS_TRANSFORM"
+        ])
+        .subscribe(() => {
+          setItems([...editor.selected]);
+          scale.current = editor.canvasTransform.s * 100;
+        });
     }
   }, [editor]);
 
-  return {};
+  const setScale = (s: number) => {
+    if (editor) {
+      const { x, y } = editor.canvasTransform;
+      editor.emit({
+        type: "SET_CANVAS_TRANSFORM",
+        payload: { s: s / 100, x, y }
+      });
+    }
+  };
+
+  return { items, scale, setScale };
 }
