@@ -15,7 +15,7 @@ export class EventBus {
     this.bus.next(params);
   }
 
-  public on(type: K): Observable<IEventTypes[K]> {
+  public on(type: K | K[]): Observable<IEventTypes[K]> {
     return this.bus.pipe(
       filter(res => res.type === type),
       map(res => res.payload)
