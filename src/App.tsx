@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Editor, EditorView, Item } from "./editor";
+import React, { createContext, useEffect, useState } from "react";
+import { Editor, EditorView } from "./editor";
+import { ItemPanel } from "./layout/ItemPanel";
+import { StylePanel } from "./layout/StylePanel";
+import { Toolbar } from "./layout/Toolbar";
+
+export const EditorContext = createContext<Editor | null>(null);
 
 export const App: React.FC = () => {
   const [editor, setEditor] = useState<Editor | null>(null);
@@ -8,29 +13,24 @@ export const App: React.FC = () => {
     setEditor(
       new Editor({
         size: { width: 500, height: 250 },
-        transform: { s: 1, x: 200, y: 200 },
-      }),
+        transform: { s: 1, x: 200, y: 200 }
+      })
     );
   }, []);
 
   return (
-    <div className="main">
-      <div className="item-panel">
-        <button
-          onClick={() => {
-            if (editor) {
-              const item = new Item("TEXT");
-              editor.addItem(item);
-            }
-          }}
-        >
-          Text
-        </button>
+    <EditorContext.Provider value={editor}>
+      <div className="main">
+        <Toolbar />
+        <div className="main-content">
+          <ItemPanel />
+          <div className="editor-content">
+            <EditorView editor={editor} />
+          </div>
+          <StylePanel />
+        </div>
       </div>
-      <div className="main-content">
-        <EditorView editor={editor} />
-      </div>
-    </div>
+    </EditorContext.Provider>
   );
 };
 
