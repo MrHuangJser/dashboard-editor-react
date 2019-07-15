@@ -16,5 +16,5 @@
     "jsx": "preserve",
     "downlevelIteration": true
   },
-  "include": ["src"]
+  "include": ["src", "src/types"]
 }
