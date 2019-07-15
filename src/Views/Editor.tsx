@@ -9,7 +9,8 @@ import {
   makeStore,
   StoreContext,
   useDispatch,
-  useMappedState
+  useMappedState,
+  useStoreDispatch
 } from "../utils";
 import { BorderArea } from "./BorderArea";
 import { Canvas } from "./Canvas";
@@ -97,6 +98,7 @@ export const EditorView = (props: { editor: Editor | null }) => {
 
 export function useEditorState() {
   const editorContainerRef = useRef<HTMLElement>();
+  const storeDispatch = useStoreDispatch();
   const dispatch = useDispatch();
   const { transform, editor } = useMappedState(state => ({
     transform: state.editorInstance.canvasTransform,
@@ -133,7 +135,7 @@ export function useEditorState() {
     let event: Subscription;
     if (editor) {
       event = editor.bus.subscribe(res => {
-        dispatch(res);
+        storeDispatch(res);
       });
     }
     return () => {
@@ -145,7 +147,6 @@ export function useEditorState() {
 
   useEffect(() => {
     const { s, ox, oy } = zoomTrans;
-    console.log(zoomTrans);
     dispatch({
       type: "SET_CANVAS_TRANSFORM",
       payload: { s, x: transform.x + ox, y: transform.y + oy }

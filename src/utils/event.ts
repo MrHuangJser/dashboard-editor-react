@@ -5,19 +5,24 @@ import { IEventTypes } from "../types";
 type K = keyof IEventTypes;
 
 export class EventBus {
-  public bus: Subject<{ type: K; payload: IEventTypes[K] }>;
+  public bus: Subject<{ type: K; payload?: IEventTypes[K] }>;
 
   constructor(event?: EventBus) {
     this.bus = event instanceof EventBus ? event.bus : new Subject();
   }
 
-  public emit(params: { type: K; payload: IEventTypes[K] }) {
+  public emit(params: { type: K; payload?: IEventTypes[K] }) {
     this.bus.next(params);
   }
 
   public on(type: K | K[]): Observable<IEventTypes[K]> {
     return this.bus.pipe(
-      filter(res => res.type === type),
+      filter(res => {
+        if (Array.isArray(type)) {
+          return type.indexOf(res.type) !== -1;
+        }
+        return res.type === type;
+      }),
       map(res => res.payload)
     );
   }

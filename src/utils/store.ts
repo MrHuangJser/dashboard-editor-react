@@ -23,8 +23,21 @@ export function makeStore(
 ): Store<IState, { type: K; payload?: IEventTypes[K] }> {
   return createStore(reducer, { ...INITIAL_STATE, ...state });
 }
-export const { StoreContext, useDispatch, useMappedState } = create<
+export const {
+  StoreContext,
+  useMappedState,
+  useDispatch: useStoreDispatch
+} = create<
   IState,
   { type: K; payload?: IEventTypes[K] },
   Store<IState, { type: K; payload?: IEventTypes[K] }>
 >();
+
+export function useDispatch() {
+  const { editor } = useMappedState(({ editorInstance }) => ({
+    editor: editorInstance
+  }));
+  return (params: { type: K; payload?: IEventTypes[K] }) => {
+    editor.emit(params);
+  };
+}
