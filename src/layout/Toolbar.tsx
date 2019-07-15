@@ -1,10 +1,11 @@
+import _ from "lodash";
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import { Subscription } from "rxjs";
 import { delay } from "rxjs/operators";
 import { EditorContext } from "../App";
 import BottomAlign from "../assets/bottom-align.svg";
 import Break from "../assets/break.svg";
-import Group from "../assets/group.svg";
+import GroupIcon from "../assets/group.svg";
 import HorizontalAlign from "../assets/horizontal-align.svg";
 import HorizontalBetween from "../assets/horizontal-between.svg";
 import LeftAlign from "../assets/left-align.svg";
@@ -15,14 +16,27 @@ import Subtract from "../assets/subtract.svg";
 import TopAlign from "../assets/top-align.svg";
 import VerticalAlign from "../assets/vertical-align.svg";
 import VerticalBetween from "../assets/vertical-between.svg";
+import { Group } from "../core/group";
 import { Item } from "../editor";
+
+export type IAlignDirection =
+  | "left"
+  | "right"
+  | "top"
+  | "bottom"
+  | "vertical"
+  | "horizontal"
+  | "vertical-between"
+  | "horizontal-between";
 
 export const Toolbar: FC = () => {
   const {
     scale,
     setScale,
+    setAlign,
     editor,
     items,
+    groupId,
     toolbarStatus: { hasSelected, isGroup, canGroup }
   } = useToolbarState();
   const className = `toolbar-item ${hasSelected ? "" : "disabled"}`;
@@ -37,32 +51,80 @@ export const Toolbar: FC = () => {
       </div>
       <div className="toolbar-center">
         <div>
-          <a className={className} title="左对齐">
+          <a
+            className={className}
+            title="左对齐"
+            onClick={() => {
+              if (hasSelected) {
+                setAlign("left");
+              }
+            }}
+          >
             <div className="icon">
               <LeftAlign className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="右对齐">
+          <a
+            className={className}
+            title="右对齐"
+            onClick={() => {
+              if (hasSelected) {
+                setAlign("right");
+              }
+            }}
+          >
             <div className="icon">
               <RightAlign className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="上对齐">
+          <a
+            className={className}
+            title="上对齐"
+            onClick={() => {
+              if (hasSelected) {
+                setAlign("top");
+              }
+            }}
+          >
             <div className="icon">
               <TopAlign className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="下对齐">
+          <a
+            className={className}
+            title="下对齐"
+            onClick={() => {
+              if (hasSelected) {
+                setAlign("bottom");
+              }
+            }}
+          >
             <div className="icon">
               <BottomAlign className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="垂直对齐">
+          <a
+            className={className}
+            title="垂直对齐"
+            onClick={() => {
+              if (hasSelected) {
+                setAlign("vertical");
+              }
+            }}
+          >
             <div className="icon">
               <VerticalAlign className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="水平对齐">
+          <a
+            className={className}
+            title="水平对齐"
+            onClick={() => {
+              if (hasSelected) {
+                setAlign("horizontal");
+              }
+            }}
+          >
             <div className="icon">
               <HorizontalAlign className="svg-icon" />
             </div>
@@ -70,6 +132,11 @@ export const Toolbar: FC = () => {
           <a
             className={`toolbar-item ${canGroup ? "" : "disabled"}`}
             title="水平分布"
+            onClick={() => {
+              if (canGroup) {
+                setAlign("horizontal-between");
+              }
+            }}
           >
             <div className="icon">
               <HorizontalBetween className="svg-icon" />
@@ -78,6 +145,11 @@ export const Toolbar: FC = () => {
           <a
             className={`toolbar-item ${canGroup ? "" : "disabled"}`}
             title="垂直分布"
+            onClick={() => {
+              if (canGroup) {
+                setAlign("vertical-between");
+              }
+            }}
           >
             <div className="icon">
               <VerticalBetween className="svg-icon" />
@@ -95,12 +167,17 @@ export const Toolbar: FC = () => {
             }}
           >
             <div className="icon">
-              <Group className="svg-icon" />
+              <GroupIcon className="svg-icon" />
             </div>
           </a>
           <a
             className={`toolbar-item ${isGroup ? "" : "disabled"}`}
             title="打散"
+            onClick={() => {
+              if (isGroup && editor) {
+                editor.emit({ type: "UN_GROUP_ITEM", payload: groupId });
+              }
+            }}
           >
             <div className="icon">
               <Break className="svg-icon" />
@@ -109,11 +186,23 @@ export const Toolbar: FC = () => {
         </div>
         <div>
           <div className="zoom-button-group">
-            <Subtract className="svg-icon" />
+            <a
+              onClick={() => {
+                setScale(scale.current - 5);
+              }}
+            >
+              <Subtract className="svg-icon" />
+            </a>
             <a onDoubleClick={() => setScale(100)}>
               {Math.round(scale.current)}%
             </a>
-            <Plus className="svg-icon" />
+            <a
+              onClick={() => {
+                setScale(scale.current + 5);
+              }}
+            >
+              <Plus className="svg-icon" />
+            </a>
           </div>
         </div>
       </div>
@@ -126,6 +215,7 @@ export function useToolbarState() {
   const editor = useContext(EditorContext);
   const scale = useRef<number>(100);
   const [items, setItems] = useState<Item[]>([]);
+  const [groupId, setGroupId] = useState<string | null>(null);
   const [toolbarStatus, setStatus] = useState({
     isGroup: false,
     hasSelected: false,
@@ -160,6 +250,7 @@ export function useToolbarState() {
     if (items.length) {
       if (items.length > 1) {
         if (items[0].groupId) {
+          setGroupId(items[0].groupId);
           setStatus({ canGroup: false, isGroup: true, hasSelected: true });
         } else {
           setStatus({ canGroup: true, isGroup: false, hasSelected: true });
@@ -168,7 +259,7 @@ export function useToolbarState() {
         setStatus({ canGroup: false, isGroup: false, hasSelected: true });
       }
     } else {
-      setStatus({ isGroup: false, canGroup: false, hasSelected: false });
+      setStatus({ canGroup: false, isGroup: false, hasSelected: false });
     }
   }, [items]);
 
@@ -182,5 +273,57 @@ export function useToolbarState() {
     }
   };
 
-  return { toolbarStatus, items, scale, setScale, editor };
+  const setAlign = (direction: IAlignDirection) => {
+    if (editor) {
+      const { canvasTransform, canvasSize } = editor;
+      if (!toolbarStatus.canGroup) {
+        const group = new Group(canvasTransform.s, items, true);
+        switch (direction) {
+          case "left":
+            editor.emit({
+              type: "TRANSLATE_ITEM",
+              payload: group.items.map(item => ({
+                id: item.id,
+                y: item.transform.y,
+                x:
+                  item.transform.x -
+                  _.minBy(group.items, i => i.transform.x)!.transform.x
+              }))
+            });
+            break;
+          case "right":
+            editor.emit({
+              type: "TRANSLATE_ITEM",
+              payload: group.items.map(item => ({
+                id: item.id,
+                y: item.transform.y,
+                x:
+                  item.transform.x +
+                  canvasSize.width -
+                  _.maxBy(group.items, i => i.transform.x)!.transform.x -
+                  item.size.width
+              }))
+            });
+            break;
+          case "top":
+            break;
+          case "bottom":
+            break;
+          case "vertical":
+            break;
+          case "horizontal":
+            break;
+        }
+      } else {
+        switch (direction) {
+          case "vertical-between":
+            break;
+          case "horizontal-between":
+            break;
+        }
+      }
+    }
+  };
+
+  return { toolbarStatus, groupId, items, scale, setScale, setAlign, editor };
 }
