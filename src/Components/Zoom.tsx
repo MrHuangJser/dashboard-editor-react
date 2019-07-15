@@ -13,7 +13,7 @@ export const useZoomState = (props: IZoomWrapProps) => {
   const [trans, setTransform] = useState({
     s: props.transform.s,
     ox: 0,
-    oy: 0,
+    oy: 0
   });
 
   useEffect(() => {
@@ -29,19 +29,18 @@ export const useZoomState = (props: IZoomWrapProps) => {
   return trans;
 
   function wheel(ev: WheelEvent) {
-    const { intensity = 0.1, domRef, transform } = props;
+    const { intensity = 0.05, domRef, transform } = props;
     ev.preventDefault();
-    if (domRef && domRef.current) {
-      const rect = domRef.current.getBoundingClientRect();
-      const cx = ev.clientX - rect.left;
-      const cy = ev.clientY - rect.top;
+    const canvasDom: HTMLElement | null = document.querySelector(".canvas");
+    if (canvasDom) {
+      const rect = canvasDom.getBoundingClientRect();
       const wheelDelta = (ev as any).wheelDelta as number;
       const delta =
         (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
       setTransform({
-        s: transform.s * (1 + delta),
-        ox: (transform.x - cx) * delta,
-        oy: (transform.y - cy) * delta,
+        s: transform.s + delta,
+        ox: -(ev.clientX - rect.left) * delta,
+        oy: -(ev.clientY - rect.top) * delta
       });
     }
   }
@@ -49,8 +48,8 @@ export const useZoomState = (props: IZoomWrapProps) => {
   function listenEvent(): Subscription | undefined {
     if (props.domRef && props.domRef.current) {
       return fromEvent<WheelEvent>(props.domRef.current, "wheel")
-        .pipe(filter((e) => e.ctrlKey || e.metaKey))
-        .subscribe((e) => wheel(e));
+        .pipe(filter(e => e.ctrlKey || e.metaKey))
+        .subscribe(e => wheel(e));
     }
   }
 };

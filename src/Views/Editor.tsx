@@ -105,7 +105,7 @@ export function useEditorState() {
 
   const zoomTrans = useZoomState({
     transform,
-    intensity: 0.1,
+    intensity: 0.05,
     domRef: editorContainerRef
   });
 
@@ -145,6 +145,7 @@ export function useEditorState() {
 
   useEffect(() => {
     const { s, ox, oy } = zoomTrans;
+    console.log(zoomTrans);
     dispatch({
       type: "SET_CANVAS_TRANSFORM",
       payload: { s, x: transform.x + ox, y: transform.y + oy }
