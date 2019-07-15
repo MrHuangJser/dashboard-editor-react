@@ -6,10 +6,11 @@ $normal-color: rgb(125, 134, 148);
 $hovered-color: rgb(65, 80, 88);
 
 .main {
-  width: 100%;
+  overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: #f0f0f0;
   * {
     user-select: none;
   }
@@ -18,10 +19,12 @@ $hovered-color: rgb(65, 80, 88);
   }
   .toolbar {
     height: 60px;
+    background-color: #fff;
     box-shadow: rgba(39, 54, 78, 0.12) 1px 0px 6px 0px;
     z-index: 4;
     display: flex;
-
+    animation-duration: 0.3s;
+    animation-name: topIn;
     .title {
       width: 300px;
       display: flex;
@@ -105,17 +108,50 @@ $hovered-color: rgb(65, 80, 88);
     display: flex;
     flex: 1;
     .item-panel {
+      background-color: #fff;
       width: 300px;
       box-shadow: rgba(213, 213, 213, 0.5) 0px 2px 30px 0px;
-      z-index: 3;
+      animation-duration: 0.3s;
+      animation-name: leftIn;
+      z-index: 2;
     }
     .editor-content {
       flex: 1;
     }
     .style-panel {
       width: 350px;
+      background-color: #fff;
       box-shadow: rgba(39, 54, 78, 0.11) 0px -2px 30px 0px;
-      z-index: 3;
+      animation-duration: 0.3s;
+      animation-name: rightIn;
+      z-index: 2;
     }
+  }
+}
+
+@keyframes leftIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes rightIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes topIn {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
