@@ -1,4 +1,6 @@
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
+import { Subscription } from "rxjs";
+import { delay } from "rxjs/operators";
 import { EditorContext } from "../App";
 import BottomAlign from "../assets/bottom-align.svg";
 import Break from "../assets/break.svg";
@@ -16,8 +18,14 @@ import VerticalBetween from "../assets/vertical-between.svg";
 import { Item } from "../editor";
 
 export const Toolbar: FC = () => {
-  const { items, scale, setScale } = useToolbarState();
-  const className = `toolbar-item ${!!items.length ? "" : "disabled"}`;
+  const {
+    scale,
+    setScale,
+    editor,
+    items,
+    toolbarStatus: { hasSelected, isGroup, canGroup }
+  } = useToolbarState();
+  const className = `toolbar-item ${hasSelected ? "" : "disabled"}`;
 
   return (
     <div className="toolbar">
@@ -59,24 +67,41 @@ export const Toolbar: FC = () => {
               <HorizontalAlign className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="水平分布">
+          <a
+            className={`toolbar-item ${canGroup ? "" : "disabled"}`}
+            title="水平分布"
+          >
             <div className="icon">
               <HorizontalBetween className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="垂直分布">
+          <a
+            className={`toolbar-item ${canGroup ? "" : "disabled"}`}
+            title="垂直分布"
+          >
             <div className="icon">
               <VerticalBetween className="svg-icon" />
             </div>
           </a>
         </div>
         <div>
-          <a className={className} title="组合">
+          <a
+            className={`toolbar-item ${canGroup ? "" : "disabled"}`}
+            title="组合"
+            onClick={() => {
+              if (canGroup && editor) {
+                editor.emit({ type: "GROUP_ITEM", payload: items });
+              }
+            }}
+          >
             <div className="icon">
               <Group className="svg-icon" />
             </div>
           </a>
-          <a className={className} title="打散">
+          <a
+            className={`toolbar-item ${isGroup ? "" : "disabled"}`}
+            title="打散"
+          >
             <div className="icon">
               <Break className="svg-icon" />
             </div>
@@ -101,10 +126,16 @@ export function useToolbarState() {
   const editor = useContext(EditorContext);
   const scale = useRef<number>(100);
   const [items, setItems] = useState<Item[]>([]);
+  const [toolbarStatus, setStatus] = useState({
+    isGroup: false,
+    hasSelected: false,
+    canGroup: false
+  });
 
   useEffect(() => {
+    let event: Subscription;
     if (editor) {
-      editor
+      event = editor
         .on([
           "SELECT_ITEM",
           "CLEAR_ITEM_SELECT",
@@ -112,12 +143,34 @@ export function useToolbarState() {
           "DELETE_ITEM",
           "SET_CANVAS_TRANSFORM"
         ])
+        .pipe(delay(10))
         .subscribe(() => {
           setItems([...editor.selected]);
           scale.current = editor.canvasTransform.s * 100;
         });
     }
+    return () => {
+      if (event) {
+        event.unsubscribe();
+      }
+    };
   }, [editor]);
+
+  useEffect(() => {
+    if (items.length) {
+      if (items.length > 1) {
+        if (items[0].groupId) {
+          setStatus({ canGroup: false, isGroup: true, hasSelected: true });
+        } else {
+          setStatus({ canGroup: true, isGroup: false, hasSelected: true });
+        }
+      } else {
+        setStatus({ canGroup: false, isGroup: false, hasSelected: true });
+      }
+    } else {
+      setStatus({ isGroup: false, canGroup: false, hasSelected: false });
+    }
+  }, [items]);
 
   const setScale = (s: number) => {
     if (editor) {
@@ -129,5 +182,5 @@ export function useToolbarState() {
     }
   };
 
-  return { items, scale, setScale };
+  return { toolbarStatus, items, scale, setScale, editor };
 }
