@@ -7,6 +7,7 @@ export class Editor extends EventBus {
   public items: Item[] = [];
   public canvasTransform: ITransform = { s: 1, x: 0, y: 0 };
   public canvasSize: ISize = { width: 800, height: 400 };
+  public selected: Item[] = [];
 
   constructor(config?: {
     size?: ISize;

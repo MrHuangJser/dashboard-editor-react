@@ -1,36 +1,12 @@
 import { Item } from "../core";
-import { ISize, ITransform } from "../types";
+import { IEventTypes } from "../types";
 import { INITIAL_STATE, IState } from "./store";
 
-export type IAction =
-  | { type: "SET_CANVAS_TRANSFORM"; payload: ITransform }
-  | { type: "SET_CANVAS_SIZE"; payload: ISize }
-  | { type: "ADD_ITEM"; payload: Item }
-  | {
-      type: "TRANSLATE_ITEM";
-      payload: Array<{
-        id: string;
-        x?: number;
-        y?: number;
-        r?: number;
-        width?: number;
-        height?: number;
-      }>;
-    }
-  | { type: "ROTATE_ITEM"; payload: { id: string; r: number } }
-  | { type: "ADD_ITEM_BORDER"; payload: Item[] }
-  | { type: "REMOVE_ITEM_BORDER"; payload: Item[] }
-  | { type: "CLEAR_ITEM_BORDER"; payload?: undefined }
-  | { type: "CLEAR_ITEM_SELECT"; payload?: undefined }
-  | { type: "SELECT_ITEM"; payload: Item | Item[] }
-  | { type: "UN_SELECT_ITEM"; payload: Item }
-  | { type: "DELETE_ITEM"; payload: Item[] }
-  | { type: "GROUP_ITEM"; payload: Item[] }
-  | { type: "UN_GROUP_ITEM"; payload: string };
+type K = keyof IEventTypes;
 
 export function reducer(
   state: IState = INITIAL_STATE,
-  action: IAction
+  action: { type: K; payload?: IEventTypes[K] }
 ): IState {
   const { editorInstance, bordered, selected } = state;
   const { items } = editorInstance;
@@ -77,12 +53,12 @@ export function reducer(
       });
       break;
     case "ADD_ITEM_BORDER":
-      action.payload.forEach(item => {
+      action.payload.forEach((item: Item) => {
         bordered.add(item);
       });
       break;
     case "REMOVE_ITEM_BORDER":
-      action.payload.forEach(item => {
+      action.payload.forEach((item: Item) => {
         bordered.delete(item);
       });
       break;
@@ -109,7 +85,7 @@ export function reducer(
       selected.delete(action.payload);
       break;
     case "DELETE_ITEM":
-      action.payload.forEach(item => {
+      action.payload.forEach((item: Item) => {
         bordered.delete(item);
         selected.delete(item);
         editorInstance.items = editorInstance.items.filter(
@@ -122,7 +98,7 @@ export function reducer(
         Math.random() * 100000
       )}`;
       editorInstance.items = editorInstance.items.map(item => {
-        if (action.payload.findIndex(i => item.id === i.id) !== -1) {
+        if (action.payload.findIndex((i: Item) => item.id === i.id) !== -1) {
           item.groupId = groupId;
         }
         return item;
@@ -137,5 +113,6 @@ export function reducer(
       });
       break;
   }
+  editorInstance.selected = [...selected];
   return { ...state };
 }
