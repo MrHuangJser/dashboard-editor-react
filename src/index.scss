@@ -1,4 +1,5 @@
-@import './styles/index.scss';
+@import "./styles/index";
+@import "./layout/Panel";
 
 $toolbar-text-color: rgb(91, 107, 115);
 $disabled-color: rgb(200, 205, 208);
@@ -140,6 +141,7 @@ $hovered-color: rgb(65, 80, 88);
       animation-duration: 0.3s;
       animation-name: rightIn;
       z-index: 2;
+      overflow-y: auto;
     }
   }
 }
