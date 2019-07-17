@@ -7,13 +7,17 @@ import {
 
 export const ObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
   const { uiSchema } = props;
-  let { "ui.options": options } = uiSchema;
-  options = options || {};
-
+  const { "ui:options": options } = uiSchema;
+  const safeOptions = (options || {}) as { [key: string]: any };
   return (
     <div className="d-flex align-items-center">
-      {!options.hideLabel ? (
-        <span className={`mr-2 ${options.labelSpan || ""}`}>{props.title}</span>
+      {!safeOptions.hideLabel ? (
+        <span
+          className={`mr-2 ${safeOptions.labelSpan || ""}`}
+          style={{ width: safeOptions.labelFixed }}
+        >
+          {props.title}
+        </span>
       ) : (
         ""
       )}
@@ -43,18 +47,19 @@ export const FieldTemplate = (props: FieldTemplateProps) => {
     children,
     uiSchema
   } = props;
+
+  const { "ui:options": options } = uiSchema;
+  const safeOptions = (options || {}) as { [key: string]: any };
   return (
-    <Col
-      className="mb-2"
-      span={
-        props.uiSchema["ui:options"]
-          ? (props.uiSchema["ui:options"].span as number)
-          : undefined
-      }
-    >
+    <Col className="mb-2" span={safeOptions.span}>
       <div className={`d-flex align-items-center ${classNames}`}>
-        {!uiSchema["ui:options"] || !uiSchema["ui:options"].hideLabel ? (
-          <span className="mr-2">{label}</span>
+        {!safeOptions.hideLabel ? (
+          <span
+            className="mr-2 text-right"
+            style={{ width: safeOptions.labelFixed }}
+          >
+            {label}
+          </span>
         ) : (
           ""
         )}
