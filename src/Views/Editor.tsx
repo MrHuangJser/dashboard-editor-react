@@ -167,8 +167,8 @@ export function useEditorState() {
         type: "SET_CANVAS_TRANSFORM",
         payload: {
           ...transform,
-          x: pointerStart[0] + moveState.mx,
-          y: pointerStart[1] + moveState.my
+          x: pointerStart[0] + Math.round(moveState.mx),
+          y: pointerStart[1] + Math.round(moveState.my)
         }
       });
     }
