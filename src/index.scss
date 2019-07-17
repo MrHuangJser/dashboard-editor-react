@@ -1,5 +1,6 @@
-@import "./styles/index";
-@import "./layout/Panel";
+@import './styles/assets/bootstrap.css';
+@import '~antd/dist/antd.css';
+@import './styles/index';
 
 $toolbar-text-color: rgb(91, 107, 115);
 $disabled-color: rgb(200, 205, 208);
