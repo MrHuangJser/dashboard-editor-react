@@ -8,11 +8,11 @@ import { canvasSchema } from "./schema/canvas";
 import widgets, { FieldTemplate, ObjectFieldTemplate } from "./schema/widgets";
 
 export const StylePanel: FC<{ editor: Editor | null }> = ({ editor }) => {
-  const { formRef, canvasFormData } = useStylePanelState(editor);
+  const { formRef, canvasFormData, updateCanvas } = useStylePanelState(editor);
   return (
     <div className="style-panel">
-      <Collapse bordered={false} activeKey="base_attr">
-        <Collapse.Panel key="base_attr" header="基础属性">
+      <Collapse bordered={false} defaultActiveKey="base_attr">
+        <Collapse.Panel key="base_attr" header="画布属性">
           <Form
             ref={ref => {
               if (ref) {
@@ -27,6 +27,7 @@ export const StylePanel: FC<{ editor: Editor | null }> = ({ editor }) => {
             FieldTemplate={FieldTemplate}
             onChange={val => {
               if (val.edit) {
+                updateCanvas(val.formData);
               }
             }}
           >
@@ -58,8 +59,15 @@ export function useStylePanelState(editor: Editor | null) {
     };
   }, [editor, formRef]);
 
+  const updateCanvas = (data: any) => {
+    if (editor) {
+      editor.emit({ type: "SET_CANVAS_SIZE", payload: data });
+    }
+  };
+
   return {
     formRef,
-    canvasFormData
+    canvasFormData,
+    updateCanvas
   };
 }
