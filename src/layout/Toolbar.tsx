@@ -17,7 +17,7 @@ import TopAlign from "../assets/top-align.svg";
 import VerticalAlign from "../assets/vertical-align.svg";
 import VerticalBetween from "../assets/vertical-between.svg";
 import { Group } from "../core/group";
-import { Item } from "../editor";
+import { Editor, Item } from "../editor";
 
 export type IAlignDirection =
   | "left"
@@ -29,16 +29,15 @@ export type IAlignDirection =
   | "vertical-between"
   | "horizontal-between";
 
-export const Toolbar: FC = () => {
+export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
   const {
     scale,
     setScale,
     setAlign,
-    editor,
     items,
     groupId,
     toolbarStatus: { hasSelected, isGroup, canGroup }
-  } = useToolbarState();
+  } = useToolbarState(editor);
   const className = `toolbar-item ${hasSelected ? "" : "disabled"}`;
 
   return (
@@ -211,8 +210,7 @@ export const Toolbar: FC = () => {
   );
 };
 
-export function useToolbarState() {
-  const editor = useContext(EditorContext);
+export function useToolbarState(editor: Editor | null) {
   const scale = useRef<number>(100);
   const [items, setItems] = useState<Item[]>([]);
   const [groupId, setGroupId] = useState<string | null>(null);

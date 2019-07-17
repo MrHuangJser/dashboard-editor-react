@@ -10,27 +10,24 @@ export const App: React.FC = () => {
   const [editor, setEditor] = useState<Editor | null>(null);
 
   useEffect(() => {
-    setEditor(
-      new Editor({
-        size: { width: 500, height: 250 },
-        transform: { s: 1, x: 200, y: 200 }
-      })
-    );
+    const editorInstance = new Editor({
+      size: { width: 500, height: 250 },
+      transform: { s: 1, x: 200, y: 200 }
+    });
+    setEditor(editorInstance);
   }, []);
 
   return (
-    <EditorContext.Provider value={editor}>
-      <div className="main">
-        <Toolbar />
-        <div className="main-content">
-          <ItemPanel />
-          <div className="editor-content">
-            <EditorView editor={editor} />
-          </div>
-          <StylePanel />
+    <div className="main">
+      <Toolbar editor={editor} />
+      <div className="main-content">
+        <ItemPanel editor={editor} />
+        <div className="editor-content">
+          <EditorView editor={editor} />
         </div>
+        <StylePanel editor={editor} />
       </div>
-    </EditorContext.Provider>
+    </div>
   );
 };
 

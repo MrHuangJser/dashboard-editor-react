@@ -16,9 +16,7 @@ import { IWidgetTypes } from "../widgets";
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
 const upEvent = fromEvent<PointerEvent>(window, "pointerup");
 
-export const ItemPanel: FC = () => {
-  const editor = useContext(EditorContext);
-
+export const ItemPanel: FC<{ editor: Editor | null }> = ({ editor }) => {
   return (
     <div className="item-panel">
       <ItemIcon editor={editor} />
