@@ -2,20 +2,18 @@ import { Observable, Subject } from "rxjs";
 import { filter, map } from "rxjs/operators";
 import { IEventTypes } from "../types";
 
-type K = keyof IEventTypes;
-
 export class EventBus {
-  public bus: Subject<{ type: K; payload?: IEventTypes[K] }>;
+  public bus: Subject<any>;
 
   constructor(event?: EventBus) {
     this.bus = event instanceof EventBus ? event.bus : new Subject();
   }
 
-  public emit(params: { type: K; payload?: IEventTypes[K] }) {
+  public emit<K extends keyof IEventTypes>(params: { type: K; payload: IEventTypes[K] }) {
     this.bus.next(params);
   }
 
-  public on(type: K | K[]): Observable<IEventTypes[K]> {
+  public on<K extends keyof IEventTypes>(type: K | K[]): Observable<IEventTypes[K]> {
     return this.bus.pipe(
       filter(res => {
         if (Array.isArray(type)) {
