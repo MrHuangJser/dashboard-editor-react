@@ -1,14 +1,6 @@
-import React, {
-  FC,
-  Fragment,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import React, { FC, Fragment, useEffect, useRef, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { map, switchMap, takeUntil } from "rxjs/operators";
-import { EditorContext } from "../App";
 import TextIcon from "../assets/text.svg";
 import { Editor, Item } from "../core";
 import { IWidgetTypes } from "../widgets";
@@ -60,10 +52,7 @@ export const ItemIcon: FC<{ editor: Editor | null }> = ({ editor }) => {
   );
 };
 
-export function useItemIconState(
-  editor: Editor | null,
-  type: keyof IWidgetTypes
-) {
+export function useItemIconState(editor: Editor | null, type: keyof IWidgetTypes) {
   const domRef = useRef<HTMLElement | undefined>();
   const [previewPosition, setPreview] = useState<{
     x: number;
@@ -74,11 +63,7 @@ export function useItemIconState(
     let event: Subscription;
     if (domRef.current) {
       event = fromEvent<PointerEvent>(domRef.current, "pointerdown")
-        .pipe(
-          switchMap(() =>
-            moveEvent.pipe(takeUntil(upEvent.pipe(map(e => up(e)))))
-          )
-        )
+        .pipe(switchMap(() => moveEvent.pipe(takeUntil(upEvent.pipe(map(e => up(e)))))))
         .subscribe(e => setPreview({ x: e.clientX, y: e.clientY }));
     }
     return () => {
@@ -90,21 +75,14 @@ export function useItemIconState(
 
   function up(e: PointerEvent) {
     setPreview(null);
-    const editorDom: HTMLElement | null = document.querySelector(
-      ".editor-content"
-    );
+    const editorDom: HTMLElement | null = document.querySelector(".editor-content");
     if (editorDom && editor) {
       const { s, x, y } = editor.canvasTransform;
       const { left, top, width, height } = editorDom.getBoundingClientRect();
-      if (
-        left < e.clientX &&
-        top < e.clientY &&
-        left + width > e.clientX &&
-        top + height > e.clientY
-      ) {
+      if (left < e.clientX && top < e.clientY && left + width > e.clientX && top + height > e.clientY) {
         const item = new Item(type);
-        item.transform.x = e.clientX - left - x * s;
-        item.transform.y = e.clientY - top - y * s;
+        item.transform.x = e.clientX - left - x;
+        item.transform.y = e.clientY - top - y;
         editor.emit({ type: "ADD_ITEM", payload: item });
       }
     }

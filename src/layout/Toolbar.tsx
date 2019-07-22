@@ -174,7 +174,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             title="打散"
             onClick={() => {
               if (isGroup && editor) {
-                editor.emit({ type: "UN_GROUP_ITEM", payload: groupId });
+                editor.emit({ type: "UN_GROUP_ITEM", payload: groupId! });
               }
             }}
           >
@@ -192,9 +192,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             >
               <Subtract className="svg-icon" />
             </a>
-            <a onDoubleClick={() => setScale(100)}>
-              {Math.round(scale.current)}%
-            </a>
+            <a onDoubleClick={() => setScale(100)}>{Math.round(scale.current)}%</a>
             <a
               onClick={() => {
                 setScale(scale.current + 5);
@@ -224,13 +222,7 @@ export function useToolbarState(editor: Editor | null) {
     let event: Subscription;
     if (editor) {
       event = editor
-        .on([
-          "SELECT_ITEM",
-          "CLEAR_ITEM_SELECT",
-          "UN_SELECT_ITEM",
-          "DELETE_ITEM",
-          "SET_CANVAS_TRANSFORM"
-        ])
+        .on(["SELECT_ITEM", "CLEAR_ITEM_SELECT", "UN_SELECT_ITEM", "DELETE_ITEM", "SET_CANVAS_TRANSFORM"])
         .pipe(delay(10))
         .subscribe(() => {
           setItems([...editor.selected]);
@@ -279,28 +271,19 @@ export function useToolbarState(editor: Editor | null) {
         switch (direction) {
           case "left":
             editor.emit({
-              type: "TRANSLATE_ITEM",
-              payload: group.items.map(item => ({
-                id: item.id,
-                y: item.transform.y,
-                x:
-                  item.transform.x -
-                  _.minBy(group.items, i => i.transform.x)!.transform.x
-              }))
+              type: "MOVE_ITEM",
+              payload: { items, my: 0, mx: -_.minBy(group.items, i => i.transform.x)!.transform.x }
             });
             break;
           case "right":
+            const rightestItem = _.maxBy(group.items, i => i.transform.x + i.size.width)!;
             editor.emit({
-              type: "TRANSLATE_ITEM",
-              payload: group.items.map(item => ({
-                id: item.id,
-                y: item.transform.y,
-                x:
-                  item.transform.x +
-                  canvasSize.width -
-                  _.maxBy(group.items, i => i.transform.x)!.transform.x -
-                  item.size.width
-              }))
+              type: "MOVE_ITEM",
+              payload: {
+                items,
+                my: 0,
+                mx: canvasSize.width - rightestItem.transform.x - rightestItem.size.width
+              }
             });
             break;
           case "top":
