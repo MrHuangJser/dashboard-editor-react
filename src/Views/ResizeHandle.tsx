@@ -1,31 +1,28 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useResizeHandle } from "../components";
-import { Group } from "../core";
+import { Group, Item } from "../core";
 import { useDispatch, useMappedState } from "../utils";
 
-let groupStart: Group | null = null;
-export const ResizeHandle: React.FC = () => {
+export const ResizeHandle: FC = () => {
   const { domRef, group } = useResizeHandleState();
   return (
     <div
       className="select-handle"
-      style={{ display: group.show ? "block" : "none" }}
+      style={{
+        display: group.show ? "block" : "none",
+        width: `${group.size.width}%`,
+        height: `${group.size.height}%`,
+        left: `${group.transform.x}%`,
+        top: `${group.transform.y}%`,
+        transform: `rotate(${group.transform.r}deg)`
+      }}
       ref={ref => {
         if (ref) {
           domRef.current = ref;
         }
       }}
     >
-      <div
-        className="rect"
-        style={{
-          width: `${group.size.width}px`,
-          height: `${group.size.height}px`,
-          transform: `translate3d(${group.transform.x}px,${
-            group.transform.y
-          }px,0) rotate(${group.transform.r}deg)`
-        }}
-      >
+      <div className="rect">
         {group.single ? (
           <div className="rotate">
             <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
@@ -53,126 +50,103 @@ export const ResizeHandle: React.FC = () => {
   );
 };
 
+const itemMapStart: Map<Item, { r: number; x: number; y: number; width: number; height: number }> = new Map();
+
 function useResizeHandleState() {
   const dispatch = useDispatch();
   const domRef = useRef<HTMLElement | undefined>();
-  const { scale, items } = useMappedState(({ editorInstance, selected }) => ({
+  const { scale, items, editor } = useMappedState(({ editorInstance, selected }) => ({
+    editor: editorInstance,
     scale: editorInstance.canvasTransform.s,
-    items: [...selected]
+    items: selected
   }));
+  const [group, setGroup] = useState<Group>(new Group(scale, [], editor.canvasSize));
 
-  const { sizeState, rotateDeg, resizeHandleStatus } = useResizeHandle({
-    domRef: domRef.current
-  });
-
-  useLayoutEffect(() => {
-    dispatch({ type: "SELECT_ITEM", payload: items });
-  }, [scale]);
+  const [resizeStatus] = useResizeHandle({ domRef });
 
   useEffect(() => {
-    if (resizeHandleStatus) {
-      groupStart = new Group(scale, items, true);
+    if (items.size) {
+      setGroup(new Group(scale, [...items], editor.canvasSize));
     } else {
-      groupStart = null;
+      setGroup(new Group(scale, [], editor.canvasSize));
     }
-  }, [resizeHandleStatus]);
+  }, [items]);
 
   useEffect(() => {
-    if (groupStart) {
-      dispatch({
-        type: "TRANSLATE_ITEM",
-        payload: items.map(item => {
-          return {
-            id: item.id,
-            ...item.transform,
-            r: getRotateDeg(
-              groupStart!.items.find(i => i.id === item.id)!.transform.r,
-              rotateDeg
-            )
-          };
-        })
+    const { status, mx, my, direction, angle } = resizeStatus;
+    switch (status) {
+      case "start":
+        items.forEach(item => {
+          itemMapStart.set(item, { ...item.transform, ...item.size });
+        });
+        console.log(itemMapStart.get([...items][0]));
+        break;
+      case "resizing":
+        if (itemMapStart.size) {
+          const itemsMap = sizeMap(mx / scale, my / scale, direction);
+          dispatch({ type: "RESIZE_ITEM", payload: itemsMap });
+          dispatch({ type: "MOVE_ITEM", payload: itemsMap });
+        }
+        break;
+      case "rotating":
+        if (itemMapStart.size) {
+          items.forEach(item => {
+            if (itemMapStart.get(item)) {
+              dispatch({
+                type: "ROTATE_ITEM",
+                payload: { item, r: getRotateDeg(itemMapStart.get(item)!.r, angle) }
+              });
+            }
+          });
+        }
+        break;
+      case "end":
+        itemMapStart.clear();
+        break;
+    }
+  }, [resizeStatus.status, resizeStatus.angle, resizeStatus.mx, resizeStatus.my]);
+
+  return { domRef, group };
+
+  function sizeMap(mx: number, my: number, direction: string) {
+    const itemsMap: Map<Item, { x: number; y: number; width: number; height: number }> = new Map();
+    if (itemMapStart.size) {
+      itemMapStart.forEach((state, item) => {
+        const { x, y, width, height } = state;
+        switch (direction) {
+          case "n":
+            itemsMap.set(item, { ...state, y: y + my, height: height - my });
+            break;
+          case "s":
+            itemsMap.set(item, { ...state, height: height + my });
+            break;
+          case "e":
+            itemsMap.set(item, { ...state, width: width + mx });
+            break;
+          case "w":
+            itemsMap.set(item, { ...state, x: x + mx, width: width - mx });
+            break;
+          case "ne":
+            itemsMap.set(item, { ...state, y: y + my, height: height - my, width: width + mx });
+            break;
+          case "nw":
+            itemsMap.set(item, { ...state, y: y + my, x: x + mx, width: width - mx, height: height - my });
+            break;
+          case "se":
+            itemsMap.set(item, { ...state, width: width + mx, height: height + my });
+            break;
+          case "sw":
+            itemsMap.set(item, { ...state, x: x + mx, width: width - mx, height: height + my });
+            break;
+        }
       });
     }
-  }, [rotateDeg]);
-
-  useEffect(() => {
-    dispatch({
-      type: "TRANSLATE_ITEM",
-      payload: sizeMap(
-        sizeState.x / scale,
-        sizeState.y / scale,
-        sizeState.direction
-      )
-    });
-  }, [sizeState]);
-
-  return { domRef, group: new Group(scale, items) };
+    return itemsMap;
+  }
 }
 
 function getRotateDeg(original: number, rotated: number) {
   let mergedRotateDeg = original + Math.round(rotated);
-  mergedRotateDeg =
-    mergedRotateDeg < 0 ? 360 + mergedRotateDeg : mergedRotateDeg;
+  mergedRotateDeg = mergedRotateDeg < 0 ? 360 + mergedRotateDeg : mergedRotateDeg;
   return 357 < mergedRotateDeg || mergedRotateDeg < 3 ? 0 : mergedRotateDeg;
-}
-
-function sizeMap(mx: number, my: number, direction: string) {
-  let items: any[] = [];
-  if (groupStart) {
-    items = groupStart.items.map(item => {
-      switch (direction) {
-        case "n":
-          return {
-            id: item.id,
-            y: item.transform.y + my,
-            height: item.size.height - my
-          };
-        case "s":
-          return {
-            id: item.id,
-            height: item.size.height + my
-          };
-        case "e":
-          return {
-            id: item.id,
-            width: item.size.width + mx
-          };
-        case "w":
-          return {
-            id: item.id,
-            x: item.transform.x + mx,
-            width: item.size.width - mx
-          };
-        case "ne":
-          return {
-            id: item.id,
-            y: item.transform.y + my,
-            height: item.size.height - my,
-            width: item.size.width + mx
-          };
-        case "nw":
-          return {
-            id: item.id,
-            y: item.transform.y + my,
-            x: item.transform.x + mx,
-            width: item.size.width - mx,
-            height: item.size.height - my
-          };
-        case "se":
-          return {
-            id: item.id,
-            width: item.size.width + mx,
-            height: item.size.height + my
-          };
-        case "sw":
-          return {
-            id: item.id,
-            x: item.transform.x + mx,
-            width: item.size.width - mx,
-            height: item.size.height + my
-          };
-      }
-    });
-  }
-  return items;
 }

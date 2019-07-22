@@ -6,12 +6,7 @@ import { ContextMenuContext, useDispatch } from "../utils";
 
 let position: [number, number] | null = null;
 
-export function useItemContextMenuEvent(props: {
-  domRef: HTMLElement | undefined;
-  item: Item;
-  items: Item[];
-  allItems: Item[];
-}) {
+export function useItemContextMenuEvent(props: { domRef: HTMLElement | null; item: Item; items: Item[] }) {
   const { setContextMenuProps } = useContext(ContextMenuContext);
   const dispatch = useDispatch();
   const [menuWillShow, setMenuWillShow] = useState<boolean>(false);
@@ -38,15 +33,9 @@ export function useItemContextMenuEvent(props: {
   useEffect(() => {
     if (menuWillShow) {
       if (props.items.findIndex(i => i.id === props.item.id) === -1) {
-        dispatch({ type: "CLEAR_ITEM_SELECT" });
+        dispatch({ type: "CLEAR_ITEM_SELECT", payload: undefined });
         if (props.item.groupId) {
-          const groupItems = props.allItems.filter(
-            i => i.groupId && i.groupId === props.item.groupId
-          );
-          dispatch({
-            type: "SELECT_ITEM",
-            payload: groupItems
-          });
+          dispatch({ type: "SELECT_GROUP", payload: props.item.groupId });
         } else {
           dispatch({ type: "SELECT_ITEM", payload: props.item });
         }

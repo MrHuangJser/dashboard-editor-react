@@ -6,7 +6,7 @@ import { ITransform } from "../types";
 export interface IZoomWrapProps {
   transform: ITransform;
   intensity?: number;
-  domRef: MutableRefObject<HTMLElement | undefined>;
+  domRef: MutableRefObject<HTMLDivElement | null>;
 }
 
 export const useZoomState = (props: IZoomWrapProps) => {
@@ -35,8 +35,7 @@ export const useZoomState = (props: IZoomWrapProps) => {
     if (canvasDom) {
       const rect = canvasDom.getBoundingClientRect();
       const wheelDelta = (ev as any).wheelDelta as number;
-      const delta =
-        (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
+      const delta = (wheelDelta ? wheelDelta / 120 : -ev.deltaY / 3) * intensity;
       setTransform({
         s: transform.s + delta,
         ox: -(ev.clientX - rect.left) * delta,

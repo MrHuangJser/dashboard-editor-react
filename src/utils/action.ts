@@ -28,23 +28,27 @@ const actions: { [K in keyof IEventTypes]: (state: IState, payload: IEventTypes[
   },
   DELETE_ITEM: (state, payload) => {
     state.editorInstance.items = _.pull(state.editorInstance.items, ...payload);
+    state.selected = new Set([...state.selected]);
   },
   GROUP_ITEM: (state, payload) => {
     const groupId = `group_${Date.now()}_${Math.round(Math.random() * 100000)}`;
     payload.forEach(item => {
       item.groupId = groupId;
     });
+    state.selected = new Set([...state.selected]);
   },
   MOVE_ITEM: (state, payload) => {
-    payload.items.forEach(item => {
-      item.transform.x += payload.mx;
-      item.transform.y += payload.my;
+    payload.forEach(({ x, y }, item) => {
+      item.transform.x = Math.round(x);
+      item.transform.y = Math.round(y);
     });
+    state.selected = new Set([...state.selected]);
   },
   RESIZE_ITEM: (state, payload) => {
-    payload.forEach(({ item, size }) => {
-      item.size = size;
+    payload.forEach(({ width, height }, item) => {
+      item.size = { width: Math.round(width), height: Math.round(height) };
     });
+    state.selected = new Set([...state.selected]);
   },
   REMOVE_ITEM_BORDER: (state, payload) => {
     if (Array.isArray(payload)) {
@@ -55,13 +59,18 @@ const actions: { [K in keyof IEventTypes]: (state: IState, payload: IEventTypes[
   },
   ROTATE_ITEM: (state, payload) => {
     payload.item.transform.r = payload.r;
+    state.selected = new Set([...state.selected]);
   },
   SELECT_GROUP: (state, payload) => {
     const items = state.editorInstance.items.filter(i => i.groupId === payload);
+    state.bordered = new Set(items);
     state.selected = new Set(items);
   },
   SELECT_ITEM: (state, payload) => {
+    state.bordered.add(payload);
     state.selected.add(payload);
+    state.bordered = new Set([...state.bordered]);
+    state.selected = new Set([...state.selected]);
   },
   UN_GROUP_ITEM: (state, payload) => {
     state.editorInstance.items.forEach(item => {
@@ -80,6 +89,8 @@ const actions: { [K in keyof IEventTypes]: (state: IState, payload: IEventTypes[
       state.bordered.delete(payload);
       state.selected.delete(payload);
     }
+    state.bordered = new Set([...state.bordered]);
+    state.selected = new Set([...state.selected]);
   }
 };
 

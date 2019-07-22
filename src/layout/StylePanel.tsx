@@ -48,9 +48,12 @@ export function useStylePanelState(editor: Editor | null) {
     if (editor && formRef.current) {
       const { canvasSize, canvasTransform } = editor;
       setCanvasFormData({ ...canvasSize, ...canvasTransform });
-      event = editor.bus.pipe(delay(50)).subscribe(() => {
-        setCanvasFormData({ ...editor.canvasSize, ...editor.canvasTransform });
-      });
+      event = editor
+        .on(["SET_CANVAS_SIZE"])
+        .pipe(delay(10))
+        .subscribe(() => {
+          setCanvasFormData({ ...editor.canvasSize });
+        });
     }
     return () => {
       if (event) {

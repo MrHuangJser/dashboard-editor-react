@@ -9,6 +9,7 @@ export function reducer<K extends keyof IEventTypes>(
   const actionFunc: (state: IState, payload: any) => void = actions[action.type];
   if (actionFunc) {
     actionFunc(state, action.payload);
+    state.editorInstance.selected = state.selected;
   }
   return { ...state };
 }

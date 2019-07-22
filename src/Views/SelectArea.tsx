@@ -1,14 +1,12 @@
+import _ from "lodash";
 import React, { MutableRefObject, useEffect, useRef } from "react";
 import { useSelectArea } from "../components/SelectArea";
-import { Group } from "../core";
 import { useDispatch, useMappedState } from "../utils";
 
 export const SelectAreaView: React.FC<{
-  domRef: MutableRefObject<HTMLElement | undefined>;
+  domRef: MutableRefObject<HTMLDivElement | null>;
 }> = ({ domRef }) => {
-  const { left, width, height, top, status, selectDomRef } = useSelectAreaState(
-    domRef
-  );
+  const { left, width, height, top, status, selectDomRef } = useSelectAreaState(domRef);
 
   return (
     <div
@@ -30,16 +28,14 @@ export const SelectAreaView: React.FC<{
   );
 };
 
-function useSelectAreaState(domRef: MutableRefObject<HTMLElement | undefined>) {
-  const dispatch = useDispatch();
+function useSelectAreaState(domRef: MutableRefObject<HTMLElement | null>) {
   const selectDomRef = useRef<HTMLElement | undefined>();
-  const { items, scale, selected: selectedItems } = useMappedState(
-    ({ editorInstance, selected }) => ({
-      items: editorInstance.items,
-      scale: editorInstance.canvasTransform.s,
-      selected: [...selected]
-    })
-  );
+  const dispatch = useDispatch();
+  const { items, selectedItems } = useMappedState(({ editorInstance, selected }) => ({
+    items: editorInstance.items,
+    selectedItems: selected,
+    scale: editorInstance.canvasTransform.s
+  }));
   const { left, top, width, height, status } = useSelectArea({ domRef });
 
   useEffect(() => {
@@ -52,35 +48,28 @@ function useSelectAreaState(domRef: MutableRefObject<HTMLElement | undefined>) {
             if (!item.groupId) {
               dispatch({ type: "SELECT_ITEM", payload: item });
             } else {
-              const group = new Group(
-                scale,
-                items.filter(i => i.groupId === item.groupId)
-              );
-              if (
-                isIn(
-                  {
-                    left: group.minXItem!.left,
-                    top: group.minYItem!.top,
-                    x: 0,
-                    y: 0,
-                    bottom: 0,
-                    right: 0,
-                    ...group.size
-                  },
-                  selectRect
-                )
-              ) {
-                dispatch({ type: "SELECT_ITEM", payload: group.items });
-              }
+              dispatch({ type: "SELECT_GROUP", payload: item.groupId });
             }
           } else {
-            if (item.groupId) {
-              dispatch({
-                type: "UN_SELECT_ITEM",
-                payload: items.filter(i => i.groupId === item.groupId)
-              });
-            } else {
+            if (!item.groupId) {
               dispatch({ type: "UN_SELECT_ITEM", payload: item });
+            } else {
+              let flag = false;
+              selectedItems.forEach(selectedItem => {
+                if (selectedItem.groupId === item.groupId && selectedItem.itemView) {
+                  const selectedItemRect = selectedItem.itemView.getBoundingClientRect();
+                  if (isIn(selectedItemRect, selectRect)) {
+                    flag = true;
+                  }
+                }
+              });
+              if (!flag) {
+                selectedItems.forEach(selectedItem => {
+                  if (selectedItem.groupId === item.groupId) {
+                    dispatch({ type: "UN_SELECT_ITEM", payload: selectedItem });
+                  }
+                });
+              }
             }
           }
         }

@@ -19,6 +19,6 @@ export interface IEventTypes {
   GROUP_ITEM: Item[];
   UN_GROUP_ITEM: string;
   SELECT_GROUP: string;
-  MOVE_ITEM: { items: Item[]; mx: number; my: number };
-  RESIZE_ITEM: Array<{ item: Item; size: ISize }>;
+  MOVE_ITEM: Map<Item, { x: number; y: number }>;
+  RESIZE_ITEM: Map<Item, { width: number; height: number }>;
 }

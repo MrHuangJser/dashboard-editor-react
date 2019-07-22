@@ -54,7 +54,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             className={className}
             title="左对齐"
             onClick={() => {
-              if (hasSelected) {
+              if (canGroup) {
                 setAlign("left");
               }
             }}
@@ -67,7 +67,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             className={className}
             title="右对齐"
             onClick={() => {
-              if (hasSelected) {
+              if (canGroup) {
                 setAlign("right");
               }
             }}
@@ -80,7 +80,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             className={className}
             title="上对齐"
             onClick={() => {
-              if (hasSelected) {
+              if (canGroup) {
                 setAlign("top");
               }
             }}
@@ -93,7 +93,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             className={className}
             title="下对齐"
             onClick={() => {
-              if (hasSelected) {
+              if (canGroup) {
                 setAlign("bottom");
               }
             }}
@@ -106,7 +106,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             className={className}
             title="垂直对齐"
             onClick={() => {
-              if (hasSelected) {
+              if (canGroup) {
                 setAlign("vertical");
               }
             }}
@@ -119,7 +119,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             className={className}
             title="水平对齐"
             onClick={() => {
-              if (hasSelected) {
+              if (canGroup) {
                 setAlign("horizontal");
               }
             }}
@@ -221,13 +221,10 @@ export function useToolbarState(editor: Editor | null) {
   useEffect(() => {
     let event: Subscription;
     if (editor) {
-      event = editor
-        .on(["SELECT_ITEM", "CLEAR_ITEM_SELECT", "UN_SELECT_ITEM", "DELETE_ITEM", "SET_CANVAS_TRANSFORM"])
-        .pipe(delay(10))
-        .subscribe(() => {
-          setItems([...editor.selected]);
-          scale.current = editor.canvasTransform.s * 100;
-        });
+      event = editor.bus.pipe(delay(100)).subscribe(() => {
+        setItems([...editor.selected]);
+        scale.current = editor.canvasTransform.s * 100;
+      });
     }
     return () => {
       if (event) {
@@ -266,25 +263,13 @@ export function useToolbarState(editor: Editor | null) {
   const setAlign = (direction: IAlignDirection) => {
     if (editor) {
       const { canvasTransform, canvasSize } = editor;
-      if (!toolbarStatus.canGroup) {
-        const group = new Group(canvasTransform.s, items, true);
+      if (toolbarStatus.canGroup && items.length > 1) {
+        const group = new Group(canvasTransform.s, items, canvasSize);
+        console.log(group);
         switch (direction) {
           case "left":
-            editor.emit({
-              type: "MOVE_ITEM",
-              payload: { items, my: 0, mx: -_.minBy(group.items, i => i.transform.x)!.transform.x }
-            });
             break;
           case "right":
-            const rightestItem = _.maxBy(group.items, i => i.transform.x + i.size.width)!;
-            editor.emit({
-              type: "MOVE_ITEM",
-              payload: {
-                items,
-                my: 0,
-                mx: canvasSize.width - rightestItem.transform.x - rightestItem.size.width
-              }
-            });
             break;
           case "top":
             break;
@@ -294,9 +279,6 @@ export function useToolbarState(editor: Editor | null) {
             break;
           case "horizontal":
             break;
-        }
-      } else {
-        switch (direction) {
           case "vertical-between":
             break;
           case "horizontal-between":

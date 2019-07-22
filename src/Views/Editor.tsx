@@ -21,40 +21,12 @@ import { ResizeHandle } from "./ResizeHandle";
 import { SelectAreaView } from "./SelectArea";
 import { ZoomArea } from "./ZoomArea";
 
-let pointerStart: [number, number] | null = null;
-
 export const Content: React.FC = () => {
-  const { editorContainerRef, clearState } = useEditorState();
-  const [contextMenuProps, setContextMenuProps] = useState<IContextMenuProps>();
-
-  useEffect(() => {
-    let event: Subscription;
-    if (editorContainerRef.current) {
-      event = fromEvent<MouseEvent>(
-        editorContainerRef.current,
-        "mousedown"
-      ).subscribe(() => {
-        clearState();
-        setContextMenuProps(undefined);
-      });
-    }
-    return () => {
-      if (event) {
-        event.unsubscribe();
-      }
-    };
-  });
+  const { editorContainerRef, contextMenuProps, setContextMenuProps } = useEditorState();
 
   return (
     <Fragment>
-      <div
-        className="editor-container"
-        ref={ref => {
-          if (ref) {
-            editorContainerRef.current = ref;
-          }
-        }}
-      >
+      <div className="editor-container" ref={editorContainerRef}>
         <ContextMenuContext.Provider value={{ setContextMenuProps }}>
           <NoZoomArea>
             <Grid />
@@ -74,36 +46,32 @@ export const Content: React.FC = () => {
   );
 };
 
-export const EditorView = (props: { editor: Editor | null }) => {
-  const [store, setStore] = useState(makeStore(INITIAL_STATE));
-
-  useEffect(() => {
-    if (props.editor) {
-      setStore(
-        makeStore({
-          editorInstance: props.editor,
-          canvasSize: props.editor.canvasSize,
-          canvasTransform: props.editor.canvasTransform
-        })
-      );
-    }
-  }, [props.editor]);
-
-  return (
-    <StoreContext.Provider value={store}>
-      <Content />
-    </StoreContext.Provider>
-  );
-};
+let pointerStart: [number, number] | null = null;
 
 export function useEditorState() {
-  const editorContainerRef = useRef<HTMLElement>();
+  const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const storeDispatch = useStoreDispatch();
   const dispatch = useDispatch();
   const { transform, editor } = useMappedState(state => ({
     transform: state.editorInstance.canvasTransform,
     editor: state.editorInstance
   }));
+  const [contextMenuProps, setContextMenuProps] = useState<IContextMenuProps>();
+
+  useEffect(() => {
+    let event: Subscription;
+    if (editorContainerRef.current) {
+      event = fromEvent<MouseEvent>(editorContainerRef.current, "mousedown").subscribe(() => {
+        dispatch({ type: "CLEAR_ITEM_SELECT", payload: undefined });
+        setContextMenuProps(undefined);
+      });
+    }
+    return () => {
+      if (event) {
+        event.unsubscribe();
+      }
+    };
+  });
 
   const zoomTrans = useZoomState({
     transform,
@@ -111,10 +79,32 @@ export function useEditorState() {
     domRef: editorContainerRef
   });
 
-  const { moveState, dragStatus } = useDragState({
+  const [moveStatus] = useDragState({
     domRef: editorContainerRef,
     useSpace: true
   });
+
+  useEffect(() => {
+    if (moveStatus) {
+      switch (moveStatus.status) {
+        case "drag-start":
+          pointerStart = [transform.x, transform.y];
+          break;
+        case "drag-move":
+          if (pointerStart) {
+            const { mx, my } = moveStatus;
+            dispatch({
+              type: "SET_CANVAS_TRANSFORM",
+              payload: { ...transform, x: pointerStart[0] + mx, y: pointerStart[1] + my }
+            });
+          }
+          break;
+        case "drag-end":
+          pointerStart = null;
+          break;
+      }
+    }
+  }, [moveStatus]);
 
   useEffect(() => {
     let event: Subscription;
@@ -153,29 +143,31 @@ export function useEditorState() {
     });
   }, [zoomTrans]);
 
-  useEffect(() => {
-    if (dragStatus) {
-      pointerStart = [transform.x, transform.y];
-    } else {
-      pointerStart = null;
-    }
-  }, [dragStatus]);
-
-  useEffect(() => {
-    if (pointerStart) {
-      dispatch({
-        type: "SET_CANVAS_TRANSFORM",
-        payload: {
-          ...transform,
-          x: pointerStart[0] + Math.round(moveState.mx),
-          y: pointerStart[1] + Math.round(moveState.my)
-        }
-      });
-    }
-  }, [moveState]);
-
   return {
     editorContainerRef,
-    clearState: () => dispatch({ type: "CLEAR_ITEM_SELECT" })
+    contextMenuProps,
+    setContextMenuProps
   };
 }
+
+export const EditorView = (props: { editor: Editor | null }) => {
+  const [store, setStore] = useState(makeStore(INITIAL_STATE));
+
+  useEffect(() => {
+    if (props.editor) {
+      setStore(
+        makeStore({
+          editorInstance: props.editor,
+          canvasSize: props.editor.canvasSize,
+          canvasTransform: props.editor.canvasTransform
+        })
+      );
+    }
+  }, [props.editor]);
+
+  return (
+    <StoreContext.Provider value={store}>
+      <Content />
+    </StoreContext.Provider>
+  );
+};

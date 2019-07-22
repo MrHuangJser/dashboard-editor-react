@@ -9,7 +9,7 @@ import { filter, map, switchMap, takeUntil } from "rxjs/operators";
 
 export interface ISelectAreaProps
   extends PropsWithChildren<{
-    domRef: MutableRefObject<HTMLElement | undefined>;
+    domRef: MutableRefObject<HTMLElement | null>;
   }> {}
 
 type SelectStatusType = "start" | "moving" | "end" | null;

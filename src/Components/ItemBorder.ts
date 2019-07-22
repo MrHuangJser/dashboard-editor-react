@@ -4,11 +4,7 @@ import { switchMap } from "rxjs/operators";
 import { Item } from "../core";
 import { useDispatch, useMappedState } from "../utils";
 
-export function useItemBorderEvent(props: {
-  item: Item;
-  allItems: Item[];
-  domRef: MutableRefObject<HTMLElement | undefined>;
-}) {
+export function useItemBorderEvent(props: { item: Item; domRef: MutableRefObject<HTMLElement | null> }) {
   const { domRef, item } = props;
   const { selectedItems } = useMappedState(({ selected }) => ({
     selectedItems: selected
@@ -22,10 +18,7 @@ export function useItemBorderEvent(props: {
         .pipe(
           switchMap(() => {
             dispatch({ type: "ADD_ITEM_BORDER", payload: [item] });
-            return fromEvent<PointerEvent>(
-              domRef.current as HTMLElement,
-              "pointerout"
-            );
+            return fromEvent<PointerEvent>(domRef.current as HTMLElement, "pointerout");
           })
         )
         .subscribe(() => {
@@ -37,5 +30,5 @@ export function useItemBorderEvent(props: {
     return () => {
       event.unsubscribe();
     };
-  }, [domRef]);
+  }, [domRef, selectedItems]);
 }
