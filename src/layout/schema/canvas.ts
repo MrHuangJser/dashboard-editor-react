@@ -10,21 +10,21 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
   width: {
     "ui:widget": "InputNumber",
     "ui:options": {
-      span: 12,
+      span: 10,
       size: "small",
       step: 10,
       min: 0,
-      labelFixed: 40
+      labelAlign: "left"
     }
   },
   height: {
     "ui:widget": "InputNumber",
     "ui:options": {
-      span: 12,
+      span: 10,
       size: "small",
       step: 10,
       min: 0,
-      labelFixed: 40
+      labelAlign: "left"
     }
   }
 };

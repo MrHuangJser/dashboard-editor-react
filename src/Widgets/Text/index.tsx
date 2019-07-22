@@ -1,8 +1,10 @@
 import { JSONSchema6 } from "json-schema";
 import React from "react";
+import { UiSchema } from "react-jsonschema-form";
 import { ITextProps } from "../types";
 
 const defaultProps: ITextProps = {
+  text: "文本组件",
   textAlign: "center",
   verticalAlign: "center"
 };
@@ -19,14 +21,15 @@ export const Text: React.FC<ITextProps> = options => {
         alignItems: props.verticalAlign
       }}
     >
-      <span>{props.text || "文本组件"}</span>
+      <span>{props.text}</span>
     </div>
   );
 };
 
-export const TextPropsScheme: JSONSchema6 = {
+export const TextPropsSchema: JSONSchema6 = {
   type: "object",
   properties: {
+    text: { type: "string", title: "文本内容" },
     textAlign: {
       type: "string",
       title: "水平对齐",
@@ -45,5 +48,20 @@ export const TextPropsScheme: JSONSchema6 = {
         { label: "下对齐", value: "end" }
       ]
     }
+  }
+};
+
+export const TextPropsUiSchema: { [k in keyof ITextProps]: UiSchema } = {
+  content: {
+    "ui:widget": "StringInput",
+    "ui:options": { span: 24, labelFixed: 100, size: "small" }
+  },
+  textAlign: {
+    "ui:widget": "Select",
+    "ui:options": { span: 24, labelFixed: 100, size: "small" }
+  },
+  verticalAlign: {
+    "ui:widget": "Select",
+    "ui:options": { span: 24, labelFixed: 100, size: "small" }
   }
 };

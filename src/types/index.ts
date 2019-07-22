@@ -21,4 +21,5 @@ export interface IEventTypes {
   SELECT_GROUP: string;
   MOVE_ITEM: Map<Item, { x: number; y: number }>;
   RESIZE_ITEM: Map<Item, { width: number; height: number }>;
+  SET_ITEM_DATA: { id: string; data: any };
 }

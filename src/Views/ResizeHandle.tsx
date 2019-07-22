@@ -79,7 +79,6 @@ function useResizeHandleState() {
         items.forEach(item => {
           itemMapStart.set(item, { ...item.transform, ...item.size });
         });
-        console.log(itemMapStart.get([...items][0]));
         break;
       case "resizing":
         if (itemMapStart.size) {

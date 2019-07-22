@@ -265,7 +265,6 @@ export function useToolbarState(editor: Editor | null) {
       const { canvasTransform, canvasSize } = editor;
       if (toolbarStatus.canGroup && items.length > 1) {
         const group = new Group(canvasTransform.s, items, canvasSize);
-        console.log(group);
         switch (direction) {
           case "left":
             break;

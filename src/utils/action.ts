@@ -91,6 +91,14 @@ const actions: { [K in keyof IEventTypes]: (state: IState, payload: IEventTypes[
     }
     state.bordered = new Set([...state.bordered]);
     state.selected = new Set([...state.selected]);
+  },
+  SET_ITEM_DATA: (state, payload) => {
+    state.editorInstance.items = state.editorInstance.items.map(item => {
+      if (item.id === payload.id) {
+        item.props = payload.data;
+      }
+      return item;
+    });
   }
 };
 
