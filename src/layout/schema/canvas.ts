@@ -14,7 +14,8 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
       size: "small",
       step: 10,
       min: 0,
-      labelAlign: "left"
+      labelAlign: "left",
+      precision: 0
     }
   },
   height: {
@@ -24,7 +25,8 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
       size: "small",
       step: 10,
       min: 0,
-      labelAlign: "left"
+      labelAlign: "left",
+      precision: 0
     }
   }
 };

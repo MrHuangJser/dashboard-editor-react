@@ -28,6 +28,7 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
     "width": {
       "ui:widget": "InputNumber",
       "ui:options": {
+        precision: 0,
         span: 10,
         size: "small",
         step: 1,
@@ -39,6 +40,7 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
     "height": {
       "ui:widget": "InputNumber",
       "ui:options": {
+        precision: 0,
         span: 10,
         size: "small",
         step: 1,
@@ -56,6 +58,7 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
     "x": {
       "ui:widget": "InputNumber",
       "ui:options": {
+        precision: 0,
         span: 8,
         size: "small",
         step: 1,
@@ -66,6 +69,7 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
     "y": {
       "ui:widget": "InputNumber",
       "ui:options": {
+        precision: 0,
         span: 8,
         size: "small",
         step: 1,
@@ -76,6 +80,7 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
     "r": {
       "ui:widget": "InputNumber",
       "ui:options": {
+        precision: 0,
         span: 8,
         size: "small",
         step: 1,
