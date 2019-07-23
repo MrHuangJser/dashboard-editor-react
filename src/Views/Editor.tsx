@@ -52,8 +52,9 @@ export function useEditorState() {
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const storeDispatch = useStoreDispatch();
   const dispatch = useDispatch();
-  const { transform, editor } = useMappedState(state => ({
+  const { transform, editor, size } = useMappedState(state => ({
     transform: state.editorInstance.canvasTransform,
+    size: state.editorInstance.canvasSize,
     editor: state.editorInstance
   }));
   const [contextMenuProps, setContextMenuProps] = useState<IContextMenuProps>();
@@ -75,6 +76,7 @@ export function useEditorState() {
 
   const zoomTrans = useZoomState({
     transform,
+    size,
     intensity: 0.05,
     domRef: editorContainerRef
   });
@@ -137,10 +139,13 @@ export function useEditorState() {
 
   useEffect(() => {
     const { s, ox, oy } = zoomTrans;
-    dispatch({
-      type: "SET_CANVAS_TRANSFORM",
-      payload: { s, x: transform.x + ox, y: transform.y + oy }
-    });
+    const scale = transform.s + s;
+    if (scale >= 0.05 && scale <= 4) {
+      dispatch({
+        type: "SET_CANVAS_TRANSFORM",
+        payload: { s: transform.s + s, x: transform.x + ox, y: transform.y + oy }
+      });
+    }
   }, [zoomTrans]);
 
   return {
