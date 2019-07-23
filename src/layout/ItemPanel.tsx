@@ -81,8 +81,8 @@ export function useItemIconState(editor: Editor | null, type: keyof IWidgetTypes
       const { left, top, width, height } = editorDom.getBoundingClientRect();
       if (left < e.clientX && top < e.clientY && left + width > e.clientX && top + height > e.clientY) {
         const item = new Item(type);
-        item.transform.x = e.clientX - left - x;
-        item.transform.y = e.clientY - top - y;
+        item.transform.x = (e.clientX - left - x) / s;
+        item.transform.y = (e.clientY - top - y) / s;
         editor.emit({ type: "ADD_ITEM", payload: item });
       }
     }
