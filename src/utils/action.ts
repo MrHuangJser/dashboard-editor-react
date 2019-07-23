@@ -28,6 +28,11 @@ const actions: { [K in keyof IEventTypes]: (state: IState, payload: IEventTypes[
   },
   DELETE_ITEM: (state, payload) => {
     state.editorInstance.items = _.pull(state.editorInstance.items, ...payload);
+    payload.forEach(item => {
+      state.bordered.delete(item);
+      state.selected.delete(item);
+    });
+    state.bordered = new Set([...state.bordered]);
     state.selected = new Set([...state.selected]);
   },
   GROUP_ITEM: (state, payload) => {
