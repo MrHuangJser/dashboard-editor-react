@@ -1,10 +1,10 @@
 import { Collapse } from "antd";
-import React, { FC, useEffect, useRef, useState } from "react";
-import { Dispatch, MutableRefObject } from "react";
+import React, { Dispatch, FC, useEffect, useRef, useState } from "react";
 import Form from "react-jsonschema-form";
 import { Subscription } from "rxjs";
 import { delay } from "rxjs/operators";
 import { Editor, Group, Item } from "../core";
+import { IWidgetProps, WidgetPropsSchemeMap } from "../Widgets";
 import { canvasSchema } from "./schema/canvas";
 import { itemSchema } from "./schema/item";
 import formWidgets, { FieldTemplate, ObjectFieldTemplate } from "./schema/widgets";
@@ -12,6 +12,7 @@ import formWidgets, { FieldTemplate, ObjectFieldTemplate } from "./schema/widget
 export const StylePanel: FC<{ editor: Editor | null }> = ({ editor }) => {
   const [canvasFormData, updateCanvas] = useCanvasStylePanelState(editor);
   const [itemBaseStyle, updateItemBaseStyle] = useBaseItemStylePanelState(editor);
+  const [customItemStyle, updateCustomItemStyle, item] = useCustomItemStylePanelState(editor);
 
   return (
     <div className="style-panel">
@@ -50,12 +51,33 @@ export const StylePanel: FC<{ editor: Editor | null }> = ({ editor }) => {
             <div />
           </Form>
         </Collapse.Panel>
+        {item && item.type !== "GROUP" ? (
+          <Collapse.Panel key="custom_item_attr" header="组件属性">
+            <Form
+              formData={customItemStyle}
+              schema={WidgetPropsSchemeMap[item.type].schema}
+              uiSchema={WidgetPropsSchemeMap[item.type].uiSchema}
+              widgets={formWidgets}
+              ObjectFieldTemplate={ObjectFieldTemplate}
+              FieldTemplate={FieldTemplate}
+              onChange={val => {
+                if (val.edit) {
+                  updateCustomItemStyle(val.formData);
+                }
+              }}
+            >
+              <div />
+            </Form>
+          </Collapse.Panel>
+        ) : (
+          ""
+        )}
       </Collapse>
     </div>
   );
 };
 
-export function useCanvasStylePanelState(editor: Editor | null): [any, (data: any) => void] {
+function useCanvasStylePanelState(editor: Editor | null): [any, (data: any) => void] {
   const [canvasFormData, setCanvasFormData] = useState<any>();
 
   useEffect(() => {
@@ -174,4 +196,40 @@ function useBaseItemStylePanelState(
   };
 
   return [itemBaseStyle, updateItemBaseStyle];
+}
+
+let itemSet: Set<Item> | null = null;
+function useCustomItemStylePanelState<K extends keyof IWidgetProps>(
+  editor: Editor | null
+): [IWidgetProps[K] | undefined, (data: IWidgetProps[K]) => void, Item | null] {
+  const [itemProps, setItemProps] = useState<IWidgetProps[K]>();
+  const [item, setItem] = useState<Item | null>(null);
+
+  useEffect(() => {
+    let event: Subscription;
+    if (editor) {
+      event = editor.bus.pipe(delay(100)).subscribe(() => {
+        itemSet = editor.selected;
+        if (itemSet.size === 1) {
+          setItem(itemSet.values().next().value);
+          setItemProps(itemSet.values().next().value.props);
+        } else {
+          setItem(null);
+        }
+      });
+    }
+    return () => {
+      if (event) {
+        event.unsubscribe();
+      }
+    };
+  }, [editor]);
+
+  const updateItemProps = (data: IWidgetProps[K]) => {
+    if (editor && itemSet && itemSet.size === 1) {
+      editor.emit({ type: "SET_ITEM_DATA", payload: { id: itemSet.values().next().value.id, data } });
+    }
+  };
+
+  return [itemProps, updateItemProps, item];
 }

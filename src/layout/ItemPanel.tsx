@@ -23,7 +23,7 @@ export const ItemIcon: FC<{ editor: Editor | null; type: keyof IWidgetTypes; siz
   size
 }) => {
   const { domRef, previewPosition, scale } = useItemIconState(editor, type);
-  const Widget = Widgets[type];
+  const Widget = Widgets[type].Widget;
   return (
     <Fragment>
       <div className="item-icon">

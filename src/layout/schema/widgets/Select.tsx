@@ -6,7 +6,13 @@ export default (props: WidgetProps) => {
   const { onChange, value, disabled, id, options, schema } = props;
   return (
     <Select
-      {...{ onChange, value, disabled, id, placeholder: schema.description }}
+      {...{
+        onChange: val => onChange(val),
+        value,
+        disabled,
+        id,
+        placeholder: schema.description
+      }}
       {...options as any}
     >
       {schema.enum

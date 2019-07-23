@@ -24,6 +24,7 @@
     position: absolute;
     transform-origin: center;
     cursor: default;
+    overflow: hidden;
   }
   .item-border {
     pointer-events: none;

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useLayoutEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useItemBorderEvent, useItemContextMenuEvent } from "../Components";
 import { useDragState } from "../Components/Drag";
 import { Item } from "../core";
@@ -9,6 +9,9 @@ export const ItemView: React.FC<{ item: Item }> = props => {
   let Widget;
   if (props.item.type !== "GROUP") {
     Widget = Widgets[props.item.type];
+    if (!props.item.props) {
+      props.item.props = Widget.props;
+    }
   }
   const { item } = props;
   const { domRef } = useItemState(props);
@@ -29,7 +32,7 @@ export const ItemView: React.FC<{ item: Item }> = props => {
         transform: `translate3d(${item.transform.x}px,${item.transform.y}px,0) rotate(${item.transform.r}deg)`
       }}
     >
-      {Widget ? <Widget {...item.props} /> : ""}
+      {Widget ? <Widget.Widget {...item.props} /> : ""}
     </div>
   );
 };

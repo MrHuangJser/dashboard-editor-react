@@ -1,5 +1,5 @@
 import { Text, TextPropsSchema } from "./Text";
-import { TextPropsUiSchema } from "./Text/index";
+import TextProps, { TextPropsUiSchema } from "./Text/index";
 import { ITextProps } from "./types";
 
 export * from "./Text";
@@ -10,7 +10,10 @@ export interface IWidgetTypes {
 }
 
 export const Widgets = {
-  TEXT: Text
+  TEXT: {
+    Widget: Text,
+    props: TextProps
+  }
 };
 
 export const WidgetPropsSchemeMap = {

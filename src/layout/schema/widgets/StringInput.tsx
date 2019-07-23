@@ -7,15 +7,21 @@ export default (props: WidgetProps) => {
     id,
     onChange,
     disabled,
-    options,
+    options: { type, size, prefix, addonAfter, addonBefore, suffix, allowClear },
     value,
     schema: { description }
   } = props;
 
   return (
     <Input
-      {...{ onChange, disabled, id, value, placeholder: description }}
-      {...options as any}
+      {...{
+        onChange: e => onChange(e.target.value),
+        disabled,
+        id,
+        value,
+        placeholder: description
+      }}
+      {...{ type, size, prefix, addonAfter, addonBefore, suffix, allowClear } as any}
     />
   );
 };

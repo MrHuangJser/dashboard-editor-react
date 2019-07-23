@@ -8,7 +8,7 @@ export default (props: WidgetProps) => {
   return (
     <InputNumber
       {...{
-        onChange,
+        onChange: val => onChange(val),
         value,
         required,
         disabled,
