@@ -19,7 +19,7 @@ export interface IEventTypes {
   GROUP_ITEM: Item[];
   UN_GROUP_ITEM: string;
   SELECT_GROUP: string;
-  MOVE_ITEM: Map<Item, { x: number; y: number }>;
+  MOVE_ITEM: Map<Item, { x: number; y: number; mx: number; my: number }>;
   RESIZE_ITEM: Map<Item, { width: number; height: number }>;
   SET_ITEM_DATA: { id: string; data: any };
 }
