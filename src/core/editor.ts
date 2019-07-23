@@ -8,12 +8,9 @@ export class Editor extends EventBus {
   public canvasTransform: ITransform = { s: 1, x: 0, y: 0 };
   public canvasSize: ISize = { width: 800, height: 400 };
   public selected: Set<Item> = new Set();
+  public editorView: HTMLElement | undefined;
 
-  constructor(config?: {
-    size?: ISize;
-    transform?: ITransform;
-    items?: Item[];
-  }) {
+  constructor(config?: { size?: ISize; transform?: ITransform; items?: Item[] }) {
     super(new EventBus());
     this.id = `${Date.now()}_${Math.round(Math.random() * 10000)}`;
     if (config) {

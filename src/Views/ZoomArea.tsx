@@ -15,7 +15,6 @@ export const ZoomArea: React.FC = ({ children }) => {
       className="zoom-area"
       style={{
         position: "absolute",
-        transformOrigin: "0 0",
         width: `${size.width}px`,
         height: `${size.height}px`,
         transform: `translate3d(${x}px,${y}px,0) scale(${s})`

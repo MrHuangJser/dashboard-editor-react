@@ -251,7 +251,7 @@ export function useToolbarState(editor: Editor | null) {
   }, [items]);
 
   const setScale = (s: number) => {
-    if (editor) {
+    if (editor && editor.editorView) {
       const { x, y } = editor.canvasTransform;
       editor.emit({
         type: "SET_CANVAS_TRANSFORM",

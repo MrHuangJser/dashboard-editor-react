@@ -22,11 +22,19 @@ import { SelectAreaView } from "./SelectArea";
 import { ZoomArea } from "./ZoomArea";
 
 export const Content: React.FC = () => {
-  const { editorContainerRef, contextMenuProps, setContextMenuProps } = useEditorState();
+  const { editorContainerRef, contextMenuProps, setContextMenuProps, editor } = useEditorState();
 
   return (
     <Fragment>
-      <div className="editor-container" ref={editorContainerRef}>
+      <div
+        className="editor-container"
+        ref={ref => {
+          if (ref) {
+            editor.editorView = ref;
+            editorContainerRef.current = ref;
+          }
+        }}
+      >
         <ContextMenuContext.Provider value={{ setContextMenuProps }}>
           <NoZoomArea>
             <Grid />
@@ -149,6 +157,7 @@ export function useEditorState() {
   }, [zoomTrans]);
 
   return {
+    editor,
     editorContainerRef,
     contextMenuProps,
     setContextMenuProps
