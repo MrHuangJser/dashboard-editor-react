@@ -167,6 +167,9 @@ function useBaseItemStylePanelState(
 
       editor.emit({ type: "MOVE_ITEM", payload: itemMap });
       editor.emit({ type: "RESIZE_ITEM", payload: itemMap });
+      if (itemMap.size === 1) {
+        editor.emit({ type: "ROTATE_ITEM", payload: { item: itemMap.keys().next().value, r: transform.r } });
+      }
     }
   };
 
