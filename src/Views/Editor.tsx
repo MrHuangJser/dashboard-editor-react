@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
-import { useDragState, useZoomState } from "../components";
+import { useDragState, useZoomState } from "../Components";
 import { Editor } from "../core";
 import { IContextMenuProps } from "../types/ContextMenu";
 import {

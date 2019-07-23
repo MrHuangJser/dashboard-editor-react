@@ -3,7 +3,7 @@ import { fromEvent, Subscription } from "rxjs";
 import { map, switchMap, takeUntil } from "rxjs/operators";
 import { Editor, Item } from "../core";
 import { ISize } from "../types";
-import { IWidgetTypes, Widgets } from "../widgets";
+import { IWidgetTypes, Widgets } from "../Widgets";
 import { IconFont } from "./components";
 
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");

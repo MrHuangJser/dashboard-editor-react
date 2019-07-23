@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react";
-import { useResizeHandle } from "../components";
+import { useResizeHandle } from "../Components";
 import { Group, Item } from "../core";
 import { useDispatch, useMappedState } from "../utils";
 

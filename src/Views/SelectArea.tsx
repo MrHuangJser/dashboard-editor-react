@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React, { MutableRefObject, useEffect, useRef } from "react";
-import { useSelectArea } from "../components/SelectArea";
+import { useSelectArea } from "../Components/SelectArea";
 import { useDispatch, useMappedState } from "../utils";
 
 export const SelectAreaView: React.FC<{

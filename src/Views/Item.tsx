@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useLayoutEffect, useRef } from "react";
-import { useItemBorderEvent, useItemContextMenuEvent } from "../components";
-import { useDragState } from "../components/Drag";
+import { useItemBorderEvent, useItemContextMenuEvent } from "../Components";
+import { useDragState } from "../Components/Drag";
 import { Item } from "../core";
 import { ContextMenuContext, useDispatch, useMappedState } from "../utils";
-import { Widgets } from "../widgets";
+import { Widgets } from "../Widgets";
 
 export const ItemView: React.FC<{ item: Item }> = props => {
   let Widget;

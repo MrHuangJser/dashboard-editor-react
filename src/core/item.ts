@@ -1,5 +1,5 @@
 import { ISize } from "../types";
-import { IWidgetTypes } from "../widgets";
+import { IWidgetTypes } from "../Widgets";
 
 type k = keyof IWidgetTypes;
 

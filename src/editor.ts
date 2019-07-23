@@ -1,5 +1,5 @@
-export * from "./views";
+export * from "./Views";
 export * from "./core";
 export * from "./types";
-export * from "./components";
+export * from "./Components";
 export * from "./utils";
