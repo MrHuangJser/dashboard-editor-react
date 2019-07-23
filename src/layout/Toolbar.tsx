@@ -1,13 +1,9 @@
-import { Icon } from "antd";
 import React, { FC, useEffect, useRef, useState } from "react";
 import { Subscription } from "rxjs";
 import { delay } from "rxjs/operators";
 import { Group } from "../core/group";
 import { Editor, Item } from "../editor";
-
-const IconFont = Icon.createFromIconfontCN({
-  scriptUrl: "//at.alicdn.com/t/font_1310204_21qcnamjaw6.js"
-});
+import { IconFont } from "./components";
 
 export type IAlignDirection =
   | "left"
@@ -192,7 +188,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
                 setScale(scale.current - 5);
               }}
             >
-            <IconFont className="svg-icon" type="icon-subtract" />
+              <IconFont className="svg-icon" type="icon-subtract" />
             </a>
             <a onDoubleClick={() => setScale(100)}>{Math.round(scale.current)}%</a>
             <a
@@ -200,7 +196,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
                 setScale(scale.current + 5);
               }}
             >
-            <IconFont className="svg-icon" type="icon-plus" />
+              <IconFont className="svg-icon" type="icon-plus" />
             </a>
           </div>
         </div>

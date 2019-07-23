@@ -1,14 +1,10 @@
-import { Icon } from "antd";
 import React, { FC, Fragment, useEffect, useRef, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { map, switchMap, takeUntil } from "rxjs/operators";
 import { Editor, Item } from "../core";
 import { ISize } from "../types";
 import { IWidgetTypes, Widgets } from "../widgets";
-
-const IconFont = Icon.createFromIconfontCN({
-  scriptUrl: "//at.alicdn.com/t/font_1310204_21qcnamjaw6.js"
-});
+import { IconFont } from "./components";
 
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
 const upEvent = fromEvent<PointerEvent>(window, "pointerup");
@@ -39,7 +35,7 @@ export const ItemIcon: FC<{ editor: Editor | null; type: keyof IWidgetTypes; siz
             }
           }}
         >
-        <IconFont className="svg-icon" type="icon-text" />
+          <IconFont className="svg-icon" type="icon-text" />
         </a>
       </div>
       {previewPosition ? (
