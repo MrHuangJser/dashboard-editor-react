@@ -1,23 +1,13 @@
-import _ from "lodash";
-import React, { FC, useContext, useEffect, useRef, useState } from "react";
+import { Icon } from "antd";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { Subscription } from "rxjs";
 import { delay } from "rxjs/operators";
-import { EditorContext } from "../App";
-import BottomAlign from "../assets/bottom-align.svg";
-import Break from "../assets/break.svg";
-import GroupIcon from "../assets/group.svg";
-import HorizontalAlign from "../assets/horizontal-align.svg";
-import HorizontalBetween from "../assets/horizontal-between.svg";
-import LeftAlign from "../assets/left-align.svg";
-import LeftArrow from "../assets/left-arrow.svg";
-import Plus from "../assets/plus.svg";
-import RightAlign from "../assets/right-align.svg";
-import Subtract from "../assets/subtract.svg";
-import TopAlign from "../assets/top-align.svg";
-import VerticalAlign from "../assets/vertical-align.svg";
-import VerticalBetween from "../assets/vertical-between.svg";
 import { Group } from "../core/group";
 import { Editor, Item } from "../editor";
+
+const IconFont = Icon.createFromIconfontCN({
+  scriptUrl: "//at.alicdn.com/t/font_1310204_21qcnamjaw6.js"
+});
 
 export type IAlignDirection =
   | "left"
@@ -44,7 +34,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
     <div className="toolbar">
       <div className="title">
         <div className="action">
-          <LeftArrow className="svg-icon" width={12} height={12} />
+          <IconFont className="svg-icon" type="icon-left-arrow" />
         </div>
         <div className="title-content">测试画面</div>
       </div>
@@ -60,7 +50,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <LeftAlign className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-left-align" />
             </div>
           </a>
           <a
@@ -73,7 +63,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <RightAlign className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-right-align" />
             </div>
           </a>
           <a
@@ -86,7 +76,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <TopAlign className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-top-align" />
             </div>
           </a>
           <a
@@ -99,7 +89,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <BottomAlign className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-bottom-align" />
             </div>
           </a>
           <a
@@ -112,7 +102,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <VerticalAlign className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-vertical-align" />
             </div>
           </a>
           <a
@@ -125,7 +115,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <HorizontalAlign className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-horizontal-align" />
             </div>
           </a>
           <a
@@ -138,7 +128,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <HorizontalBetween className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-horizontal-between" />
             </div>
           </a>
           <a
@@ -151,7 +141,19 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <VerticalBetween className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-vertical-between" />
+            </div>
+          </a>
+        </div>
+        <div>
+          <a className={`toolbar-item`} title="撤销">
+            <div className="icon">
+              <IconFont className="svg-icon" type="icon-Undo" />
+            </div>
+          </a>
+          <a className={`toolbar-item`} title="重做">
+            <div className="icon">
+              <IconFont className="svg-icon" type="icon-Redo" />
             </div>
           </a>
         </div>
@@ -166,7 +168,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <GroupIcon className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-group" />
             </div>
           </a>
           <a
@@ -179,7 +181,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
             }}
           >
             <div className="icon">
-              <Break className="svg-icon" />
+              <IconFont className="svg-icon" type="icon-break" />
             </div>
           </a>
         </div>
@@ -190,7 +192,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
                 setScale(scale.current - 5);
               }}
             >
-              <Subtract className="svg-icon" />
+            <IconFont className="svg-icon" type="icon-subtract" />
             </a>
             <a onDoubleClick={() => setScale(100)}>{Math.round(scale.current)}%</a>
             <a
@@ -198,7 +200,7 @@ export const Toolbar: FC<{ editor: Editor | null }> = ({ editor }) => {
                 setScale(scale.current + 5);
               }}
             >
-              <Plus className="svg-icon" />
+            <IconFont className="svg-icon" type="icon-plus" />
             </a>
           </div>
         </div>
