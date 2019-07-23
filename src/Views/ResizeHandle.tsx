@@ -23,7 +23,7 @@ export const ResizeHandle: FC = () => {
       }}
     >
       <div className="rect">
-        {group.single ? (
+        {/* group.single ? (
           <div className="rotate">
             <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -36,7 +36,7 @@ export const ResizeHandle: FC = () => {
           </div>
         ) : (
           ""
-        )}
+        ) */}
         <div className="n block" style={{ cursor: "n-resize" }} />
         <div className="s block" style={{ cursor: "s-resize" }} />
         <div className="e block" style={{ cursor: "e-resize" }} />
@@ -108,34 +108,45 @@ function useResizeHandleState() {
   return { domRef, group };
 
   function sizeMap(mx: number, my: number, direction: string) {
-    const itemsMap: Map<Item, { x: number; y: number; width: number; height: number }> = new Map();
+    const itemsMap: Map<
+      Item,
+      { x: number; y: number; mx: number; my: number; width: number; height: number }
+    > = new Map();
     if (itemMapStart.size) {
       itemMapStart.forEach((state, item) => {
         const { x, y, width, height } = state;
         switch (direction) {
           case "n":
-            itemsMap.set(item, { ...state, y: y + my, height: height - my });
+            itemsMap.set(item, { ...state, mx, my, y: y + my, height: height - my });
             break;
           case "s":
-            itemsMap.set(item, { ...state, height: height + my });
+            itemsMap.set(item, { ...state, mx, my, height: height + my });
             break;
           case "e":
-            itemsMap.set(item, { ...state, width: width + mx });
+            itemsMap.set(item, { ...state, mx, my, width: width + mx });
             break;
           case "w":
-            itemsMap.set(item, { ...state, x: x + mx, width: width - mx });
+            itemsMap.set(item, { ...state, mx, my, x: x + mx, width: width - mx });
             break;
           case "ne":
-            itemsMap.set(item, { ...state, y: y + my, height: height - my, width: width + mx });
+            itemsMap.set(item, { ...state, mx, my, y: y + my, height: height - my, width: width + mx });
             break;
           case "nw":
-            itemsMap.set(item, { ...state, y: y + my, x: x + mx, width: width - mx, height: height - my });
+            itemsMap.set(item, {
+              ...state,
+              mx,
+              my,
+              y: y + my,
+              x: x + mx,
+              width: width - mx,
+              height: height - my
+            });
             break;
           case "se":
-            itemsMap.set(item, { ...state, width: width + mx, height: height + my });
+            itemsMap.set(item, { ...state, mx, my, width: width + mx, height: height + my });
             break;
           case "sw":
-            itemsMap.set(item, { ...state, x: x + mx, width: width - mx, height: height + my });
+            itemsMap.set(item, { ...state, mx, my, x: x + mx, width: width - mx, height: height + my });
             break;
         }
       });

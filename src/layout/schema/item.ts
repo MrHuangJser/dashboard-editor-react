@@ -12,7 +12,7 @@ const schema: JSONSchema6 = {
     transform: {
       type: "object",
       properties: {
-        r: { type: "number", title: "旋转" },
+        // r: { type: "number", title: "旋转" },
         x: { type: "number", title: "X" },
         y: { type: "number", title: "Y" }
       }
@@ -59,7 +59,7 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
       "ui:widget": "InputNumber",
       "ui:options": {
         precision: 0,
-        span: 8,
+        span: 10,
         size: "small",
         step: 1,
         labelFixed: 30,
@@ -70,7 +70,7 @@ const uiSchema: { [key: string]: UiSchema } & UiSchema = {
       "ui:widget": "InputNumber",
       "ui:options": {
         precision: 0,
-        span: 8,
+        span: 10,
         size: "small",
         step: 1,
         labelFixed: 30,

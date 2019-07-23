@@ -177,11 +177,16 @@ function useBaseItemStylePanelState(
       const increaseW = size.width - (groupStart.size.width * canvasSize.width) / 100;
       const increaseH = size.height - (groupStart.size.height * canvasSize.height) / 100;
 
-      const itemMap = new Map<Item, { x: number; y: number; width: number; height: number }>();
+      const itemMap = new Map<
+        Item,
+        { x: number; y: number; mx: number; my: number; width: number; height: number }
+      >();
       itemMapStart.forEach(({ x, y, width, height }, item) => {
         itemMap.set(item, {
           x: x + increaseX,
           y: y + increaseY,
+          mx: increaseX,
+          my: increaseY,
           width: width + increaseW,
           height: height + increaseH
         });
