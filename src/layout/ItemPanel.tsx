@@ -3,7 +3,8 @@ import { fromEvent, Subscription } from "rxjs";
 import { map, switchMap, takeUntil } from "rxjs/operators";
 import TextIcon from "../assets/text.svg";
 import { Editor, Item } from "../core";
-import { IWidgetTypes } from "../widgets";
+import { ISize } from "../types";
+import { IWidgetTypes, Widgets } from "../widgets";
 
 const moveEvent = fromEvent<PointerEvent>(window, "pointermove");
 const upEvent = fromEvent<PointerEvent>(window, "pointerup");
@@ -11,13 +12,18 @@ const upEvent = fromEvent<PointerEvent>(window, "pointerup");
 export const ItemPanel: FC<{ editor: Editor | null }> = ({ editor }) => {
   return (
     <div className="item-panel">
-      <ItemIcon editor={editor} />
+      <ItemIcon editor={editor} type="TEXT" size={{ width: 100, height: 50 }} />
     </div>
   );
 };
 
-export const ItemIcon: FC<{ editor: Editor | null }> = ({ editor }) => {
-  const { domRef, previewPosition } = useItemIconState(editor, "TEXT");
+export const ItemIcon: FC<{ editor: Editor | null; type: keyof IWidgetTypes; size: ISize }> = ({
+  editor,
+  type,
+  size
+}) => {
+  const { domRef, previewPosition, scale } = useItemIconState(editor, type);
+  const Widget = Widgets[type];
   return (
     <Fragment>
       <div className="item-icon">
@@ -35,15 +41,19 @@ export const ItemIcon: FC<{ editor: Editor | null }> = ({ editor }) => {
       {previewPosition ? (
         <div
           style={{
+            ...size,
+            transformOrigin: "0 0",
+            transform: `scale(${scale})`,
             display: "block",
             position: "fixed",
             zIndex: 99,
-            left: previewPosition.x,
-            top: previewPosition.y,
-            fontSize: 60
+            left: Math.round(previewPosition.x),
+            top: Math.round(previewPosition.y),
+            border: "1px solid #298df8",
+            boxSizing: "border-box"
           }}
         >
-          <TextIcon className="svg-icon" width="60" height="60" />
+          {<Widget />}
         </div>
       ) : (
         ""
@@ -88,5 +98,5 @@ export function useItemIconState(editor: Editor | null, type: keyof IWidgetTypes
     }
   }
 
-  return { domRef, previewPosition };
+  return { domRef, previewPosition, scale: editor ? editor.canvasTransform.s : 1 };
 }
